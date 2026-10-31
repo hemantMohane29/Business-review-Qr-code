@@ -16,7 +16,7 @@ const A = (() => {
   };
 
   const DEFAULT_PIN   = 'admin1234';
-  const REVIEW_PAGE   = 'review.html';
+  const REVIEW_PAGE   = 'customer-review.html';
 
   /* ── STATE ────────────────────────────────────────────── */
   let businesses  = [];
@@ -168,30 +168,13 @@ const A = (() => {
   }
 
   function getReviewUrl(bizId) {
+    // Use clean, simple URLs with just business ID
+    // Customer's device will load data from localStorage or fallback to embedded data
     const base = location.origin + location.pathname.replace(/[^/]*$/, REVIEW_PAGE);
-    const biz  = businesses.find(b => b.id === bizId);
-
-    // Always include the business ID for backward compatibility
+    
+    // Simple URL with just business ID (preferred)
     let url = `${base}?b=${encodeURIComponent(bizId)}`;
-
-    // Embed business data so the review page works on ANY device (not just admin's browser).
-    // Customers scan the QR on their phone — they have no localStorage data.
-    if (biz) {
-      const payload = {
-        id: biz.id,
-        n:  biz.name,
-        t:  biz.type,
-        g:  biz.googleUrl,
-        p:  biz.phone  || '',
-        e:  biz.email  || '',
-        k:  biz.apiKey || '',
-      };
-      try {
-        const encoded = btoa(encodeURIComponent(JSON.stringify(payload)));
-        url += `&d=${encoded}`;
-      } catch(e) { /* skip encoding if it fails */ }
-    }
-
+    
     return url;
   }
 
