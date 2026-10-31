@@ -550,7 +550,18 @@ const R = (() => {
     // WhatsApp
     document.getElementById('btn-wa')?.addEventListener('click', () => {
       if (!validateFB()) return;
-      if (!business.phone) { alert('Manager WhatsApp not configured. Contact admin.'); return; }
+      if (!business.phone) { 
+        alert('Manager WhatsApp not configured. Please add WhatsApp number in admin panel.'); 
+        return; 
+      }
+      
+      // Clean and validate phone number
+      const cleanPhone = business.phone.replace(/\D/g, '');
+      if (!cleanPhone || cleanPhone.length < 10) {
+        alert('Invalid WhatsApp number format. Please use format: +919876543210'); 
+        return;
+      }
+      
       const data = collectFB();
       
       let text;
@@ -573,7 +584,17 @@ const R = (() => {
         );
       }
       
-      window.open(`https://wa.me/${business.phone.replace(/\D/g,'')}?text=${text}`, '_blank');
+      const waUrl = `https://wa.me/${cleanPhone}?text=${text}`;
+      console.log('Opening WhatsApp URL:', waUrl);
+      
+      // Try to open WhatsApp
+      const waWindow = window.open(waUrl, '_blank');
+      if (!waWindow || waWindow.closed || typeof waWindow.closed === 'undefined') {
+        // Popup blocked - try direct navigation
+        alert('Please allow popups for WhatsApp to open. Redirecting now...');
+        window.location.href = waUrl;
+      }
+      
       showDone(false);
     });
 
@@ -589,9 +610,17 @@ const R = (() => {
       if (action === 'whatsapp-direct') {
         // Mobile 3-star: Send directly to WhatsApp
         if (!business.phone) { 
-          alert('WhatsApp not configured. Please contact support.'); 
+          alert('WhatsApp not configured. Please add WhatsApp number in admin panel.'); 
           return; 
         }
+        
+        // Clean and validate phone number
+        const cleanPhone = business.phone.replace(/\D/g, '');
+        if (!cleanPhone || cleanPhone.length < 10) {
+          alert('Invalid WhatsApp number format. Please use format: +919876543210'); 
+          return;
+        }
+        
         const data = collectFB();
         const text = encodeURIComponent(
           `💬 *Customer Feedback (${rating}★)*\n\n` +
@@ -600,7 +629,10 @@ const R = (() => {
           `\n*Feedback:*\n"${data.msg}"\n\n` +
           `_Quick feedback via SmartReview_`
         );
-        window.location.href = `https://wa.me/${business.phone.replace(/\D/g,'')}?text=${text}`;
+        
+        const waUrl = `https://wa.me/${cleanPhone}?text=${text}`;
+        console.log('Mobile: Opening WhatsApp URL:', waUrl);
+        window.location.href = waUrl;
         setTimeout(() => showDone(false), 500);
         return;
       }

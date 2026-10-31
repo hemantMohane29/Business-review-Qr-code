@@ -287,6 +287,23 @@ const A = (() => {
       document.getElementById('f-google-url')?.focus();
       return;
     }
+    // Validate WhatsApp number format if provided
+    if (phone && phone.length > 0) {
+      const cleanPhone = phone.replace(/\D/g, '');
+      if (cleanPhone.length < 10 || cleanPhone.length > 15) {
+        errMsg.textContent = 'WhatsApp number must be 10-15 digits. Include country code (e.g., +919876543210).';
+        errEl.classList.remove('hidden');
+        document.getElementById('f-phone')?.focus();
+        return;
+      }
+      // Check if it starts with + or digit
+      if (!phone.match(/^[\+\d]/)) {
+        errMsg.textContent = 'WhatsApp number must start with + or a digit (e.g., +919876543210).';
+        errEl.classList.remove('hidden');
+        document.getElementById('f-phone')?.focus();
+        return;
+      }
+    }
     errEl.classList.add('hidden');
 
     const btn = document.getElementById('btn-save-biz');
