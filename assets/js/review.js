@@ -195,20 +195,35 @@ const R = (() => {
     const waBtn = document.getElementById('btn-wa');
     const emailBtn = document.querySelector('#fb-form button[type="submit"]');
     const msgTextarea = document.getElementById('fb-msg');
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
     if (formRow) formRow.style.display = 'none'; // Hide name/contact fields
     
     // Show WhatsApp as primary action for 3 stars
     if (business.phone) {
-      // Has WhatsApp configured - show WhatsApp button as primary
-      if (waBtn) {
-        waBtn.style.display = 'flex';
-        waBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.78-.877-2.056-.977-.275-.1-.476-.15-.677.15-.2.301-.777.977-.953 1.178-.175.2-.351.226-.652.075s-1.272-.468-2.424-1.494c-.896-.799-1.502-1.786-1.678-2.087-.175-.301-.019-.464.132-.614.135-.135.301-.351.451-.527.151-.176.201-.301.301-.502.1-.2.05-.376-.025-.526-.075-.15-.677-1.632-.927-2.234-.244-.587-.492-.507-.677-.516l-.577-.01c-.2 0-.526.075-.802.376-.276.301-1.053 1.028-1.053 2.507 0 1.479 1.078 2.908 1.228 3.109.15.2 2.122 3.24 5.141 4.544.718.31 1.278.496 1.716.635.722.23 1.38.197 1.9.12.58-.086 1.78-.727 2.03-1.43.25-.702.25-1.304.175-1.43-.075-.125-.276-.2-.577-.35zM12.04 2C6.51 2 2.02 6.49 2.02 12.02c0 1.99.58 3.84 1.59 5.4L2 22.5l5.24-1.57c1.5 1 3.29 1.58 5.2 1.58 5.53 0 10.02-4.49 10.02-10.02C22.46 6.49 17.57 2 12.04 2z"/></svg> Send to WhatsApp';
-        waBtn.style.background = '#25D366';
-        waBtn.style.color = 'white';
-        waBtn.classList.add('btn-primary');
+      // Has WhatsApp configured
+      if (isMobile) {
+        // MOBILE: Auto-send directly to WhatsApp when user submits
+        if (waBtn) waBtn.style.display = 'none'; // Hide button
+        if (emailBtn) {
+          emailBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Send Feedback';
+          emailBtn.style.background = '#25D366'; // WhatsApp green
+          emailBtn.style.color = 'white';
+          emailBtn.classList.add('btn-primary');
+          emailBtn.classList.remove('btn-outline');
+          emailBtn.setAttribute('data-action', 'whatsapp-direct');
+        }
+      } else {
+        // DESKTOP: Show WhatsApp button
+        if (waBtn) {
+          waBtn.style.display = 'flex';
+          waBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.78-.877-2.056-.977-.275-.1-.476-.15-.677.15-.2.301-.777.977-.953 1.178-.175.2-.351.226-.652.075s-1.272-.468-2.424-1.494c-.896-.799-1.502-1.786-1.678-2.087-.175-.301-.019-.464.132-.614.135-.135.301-.351.451-.527.151-.176.201-.301.301-.502.1-.2.05-.376-.025-.526-.075-.15-.677-1.632-.927-2.234-.244-.587-.492-.507-.677-.516l-.577-.01c-.2 0-.526.075-.802.376-.276.301-1.053 1.028-1.053 2.507 0 1.479 1.078 2.908 1.228 3.109.15.2 2.122 3.24 5.141 4.544.718.31 1.278.496 1.716.635.722.23 1.38.197 1.9.12.58-.086 1.78-.727 2.03-1.43.25-.702.25-1.304.175-1.43-.075-.125-.276-.2-.577-.35zM12.04 2C6.51 2 2.02 6.49 2.02 12.02c0 1.99.58 3.84 1.59 5.4L2 22.5l5.24-1.57c1.5 1 3.29 1.58 5.2 1.58 5.53 0 10.02-4.49 10.02-10.02C22.46 6.49 17.57 2 12.04 2z"/></svg> Send to WhatsApp';
+          waBtn.style.background = '#25D366';
+          waBtn.style.color = 'white';
+          waBtn.classList.add('btn-primary');
+        }
+        if (emailBtn) emailBtn.style.display = 'none'; // Hide email on desktop
       }
-      if (emailBtn) emailBtn.style.display = 'none'; // Hide email for 3 stars
     } else {
       // No WhatsApp - fall back to email
       if (waBtn) waBtn.style.display = 'none';
@@ -217,6 +232,7 @@ const R = (() => {
         emailBtn.style.background = '#1A73E8';
         emailBtn.classList.add('btn-primary');
         emailBtn.classList.remove('btn-outline');
+        emailBtn.removeAttribute('data-action');
       }
     }
     
@@ -228,7 +244,13 @@ const R = (() => {
     const shieldTitle = document.querySelector('.shield-title');
     const shieldSub = document.querySelector('.shield-sub');
     if (shieldTitle) shieldTitle.textContent = 'Help us improve';
-    if (shieldSub) shieldSub.innerHTML = 'Your quick feedback goes <strong>directly via WhatsApp</strong>, never to Google';
+    if (shieldSub) {
+      if (isMobile && business.phone) {
+        shieldSub.innerHTML = 'Your feedback goes <strong>directly to our WhatsApp</strong>, never to Google';
+      } else {
+        shieldSub.innerHTML = 'Your quick feedback goes <strong>directly via WhatsApp</strong>, never to Google';
+      }
+    }
   }
 
   function setupFullFeedback() {
@@ -542,6 +564,29 @@ const R = (() => {
     form?.addEventListener('submit', e => {
       e.preventDefault();
       if (!validateFB()) return;
+      
+      // Check if this is a mobile WhatsApp direct action (3 stars)
+      const emailBtn = e.submitter || e.target.querySelector('button[type="submit"]');
+      if (emailBtn?.getAttribute('data-action') === 'whatsapp-direct') {
+        // Mobile 3-star: Send directly to WhatsApp
+        if (!business.phone) { 
+          alert('WhatsApp not configured. Please contact support.'); 
+          return; 
+        }
+        const data = collectFB();
+        const text = encodeURIComponent(
+          `💬 *Customer Feedback (${rating}★)*\n\n` +
+          `📍 ${business.name}\n` +
+          `${data.issues !== 'General' ? `📌 ${data.issues}\n` : ''}` +
+          `\n*Feedback:*\n"${data.msg}"\n\n` +
+          `_Quick feedback via SmartReview_`
+        );
+        window.location.href = `https://wa.me/${business.phone.replace(/\D/g,'')}?text=${text}`;
+        setTimeout(() => showDone(false), 500);
+        return;
+      }
+      
+      // Regular email submission
       if (!business.email) { alert('Manager email not configured. Contact admin.'); return; }
       const data = collectFB();
       const sub  = encodeURIComponent(`Private Feedback: ${rating}★ | ${business.name}`);

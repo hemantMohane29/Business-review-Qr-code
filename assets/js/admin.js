@@ -322,11 +322,25 @@ const A = (() => {
   function deleteBusiness() {
     const biz = businesses.find(b => b.id === editingId);
     if (!biz) return;
-    if (businesses.length === 1) { toast('You must keep at least one business.', 'error'); return; }
-    if (!window.confirm(`Delete "${biz.name}"? This cannot be undone.`)) return;
+    
+    const confirmMsg = businesses.length === 1 
+      ? `Delete "${biz.name}"? This is your only business. You can add a new one later.`
+      : `Delete "${biz.name}"? This cannot be undone.`;
+    
+    if (!window.confirm(confirmMsg)) return;
+
+    // Delete all stats for this business
+    ['scans', 'reviews', 'shielded'].forEach(key => {
+      localStorage.removeItem(KEYS.stat(editingId, key));
+    });
 
     businesses = businesses.filter(b => b.id !== editingId);
-    if (activeId === editingId) activeId = businesses[0]?.id || null;
+    
+    // Set new active business or null
+    if (activeId === editingId) {
+      activeId = businesses[0]?.id || null;
+    }
+    
     editingId = null;
     save();
 
@@ -337,7 +351,12 @@ const A = (() => {
     renderQR();
     updateStats();
     updateReviewUrlDisplay();
-    toast('Business deleted.', 'info');
+    toast('Business deleted successfully.', 'success');
+    
+    // If no businesses left, show empty state
+    if (businesses.length === 0) {
+      nav('businesses');
+    }
   }
 
   /* ── QR CODE ──────────────────────────────────────────── */
