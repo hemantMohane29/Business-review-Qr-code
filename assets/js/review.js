@@ -39,15 +39,59 @@ const R = (() => {
     const bizId  = params.get('b') || params.get('biz');
     const biz    = loadBusiness(bizId);
 
-    if (!biz) { showView('view-setup'); return; }
+    if (!biz) { 
+      // Create demo business if none exists
+      business = createDemoBusinessIfNeeded();
+      if (!business) {
+        showView('view-setup'); 
+        return;
+      }
+    } else {
+      business = biz;
+    }
 
-    business = biz;
     applyBizToUI();
     incStat('scans');
     showView('view-rate');
     bindRating();
     bindForm();
     bindButtons();
+  }
+
+  function createDemoBusinessIfNeeded() {
+    // Check if we should create a demo business for testing
+    const params = new URLSearchParams(location.search);
+    const demo = params.get('demo');
+    
+    // If no businesses exist at all, create a default demo
+    try {
+      const list = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+      if (list.length === 0) {
+        // Create default demo business
+        const demoBiz = {
+          id: 'demo-business-001',
+          name: 'Demo Business',
+          type: 'restaurant',
+          avatar: '🏪',
+          googleUrl: 'https://g.page/r/EXAMPLE/review',
+          phone: '',
+          email: '',
+          geminiKey: '',
+          createdAt: Date.now()
+        };
+        
+        // Save demo business
+        localStorage.setItem(STORE_KEY, JSON.stringify([demoBiz]));
+        localStorage.setItem(ACTIVE_KEY, demoBiz.id);
+        
+        return demoBiz;
+      }
+      
+      // Return first business if exists
+      return list[0];
+    } catch {
+      return null;
+    }
   }
 
   function loadBusiness(id) {

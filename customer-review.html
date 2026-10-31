@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -49,14 +49,14 @@
 
 <div class="page">
 
-  <!-- â”€â”€ SETUP NEEDED (shown when no business configured) â”€â”€ -->
+  <!-- ── SETUP NEEDED (shown when no business configured) ── -->
   <div id="view-setup" class="step active setup-needed" style="padding-top:60px">
-    <div class="setup-icon">âš™ï¸</div>
+    <div class="setup-icon">⚙️</div>
     <h2 class="setup-title">Not Configured Yet</h2>
     <p class="setup-msg">This review link hasn't been set up yet.<br/>Please contact the business owner.</p>
   </div>
 
-  <!-- â”€â”€ STEP 1: STAR RATING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <!-- ── STEP 1: STAR RATING ───────────────────────────────── -->
   <div id="view-rate" class="step" aria-label="Rate your experience">
     <div class="topbar">
       <div class="topbar-badge" aria-label="Google Reviews">
@@ -75,27 +75,27 @@
 
     <div style="padding:28px 20px">
       <div class="biz-hero">
-        <div class="biz-avatar" id="r-avatar">âœ¨</div>
-        <h1 class="biz-name">How was your visit to<br><span id="r-biz-name">â€¦</span>?</h1>
+        <div class="biz-avatar" id="r-avatar">✨</div>
+        <h1 class="biz-name">How was your visit to<br><span id="r-biz-name">…</span>?</h1>
         <p class="biz-category" id="r-category"></p>
       </div>
 
       <div class="rating-card">
         <p class="rating-card-label">Tap a star to rate your experience</p>
         <div class="stars-row" id="stars-row" role="group" aria-label="Star rating">
-          <button class="star-btn" data-v="1" aria-label="1 star â€“ Terrible" type="button">
+          <button class="star-btn" data-v="1" aria-label="1 star – Terrible" type="button">
             <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           </button>
-          <button class="star-btn" data-v="2" aria-label="2 stars â€“ Poor" type="button">
+          <button class="star-btn" data-v="2" aria-label="2 stars – Poor" type="button">
             <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           </button>
-          <button class="star-btn" data-v="3" aria-label="3 stars â€“ Average" type="button">
+          <button class="star-btn" data-v="3" aria-label="3 stars – Average" type="button">
             <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           </button>
-          <button class="star-btn" data-v="4" aria-label="4 stars â€“ Good" type="button">
+          <button class="star-btn" data-v="4" aria-label="4 stars – Good" type="button">
             <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           </button>
-          <button class="star-btn" data-v="5" aria-label="5 stars â€“ Excellent" type="button">
+          <button class="star-btn" data-v="5" aria-label="5 stars – Excellent" type="button">
             <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           </button>
         </div>
@@ -103,14 +103,14 @@
       </div>
 
       <div class="feature-strip">
-        <div class="feature-chip">âš¡ 30-second review</div>
-        <div class="feature-chip">âœ¨ AI-assisted</div>
-        <div class="feature-chip">ðŸ”’ Protected</div>
+        <div class="feature-chip">⚡ 30-second review</div>
+        <div class="feature-chip">✨ AI-assisted</div>
+        <div class="feature-chip">🔒 Protected</div>
       </div>
     </div>
   </div>
 
-  <!-- â”€â”€ STEP 2: AI REVIEW BUILDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <!-- ── STEP 2: AI REVIEW BUILDER ─────────────────────────── -->
   <div id="view-build" class="step" aria-label="Build your review">
     <div class="topbar">
       <button class="topbar-back" onclick="R.goTo('view-rate')" aria-label="Go back">
@@ -123,27 +123,27 @@
 
     <div style="padding:24px 20px">
       <h2 class="section-heading">What did you enjoy most?</h2>
-      <p class="section-sub">Select highlights â€” AI will craft your personalised review</p>
+      <p class="section-sub">Select highlights — AI will craft your personalised review</p>
 
       <div class="chips-wrap" id="chips-wrap" role="group" aria-label="Select highlights"></div>
 
       <div class="add-custom-row">
-        <input type="text" id="custom-kw" placeholder="Add your own highlightâ€¦" maxlength="50" aria-label="Custom highlight"/>
+        <input type="text" id="custom-kw" placeholder="Add your own highlight…" maxlength="50" aria-label="Custom highlight"/>
         <button class="btn-add-kw" onclick="R.addCustomChip()" type="button">+ Add</button>
       </div>
 
       <div class="options-row">
         <div class="select-group">
-          <label for="sel-tone">âœï¸ Tone</label>
+          <label for="sel-tone">✍️ Tone</label>
           <select id="sel-tone">
-            <option value="enthusiastic">ðŸŒŸ Enthusiastic</option>
-            <option value="natural">âš¡ Natural & Punchy</option>
-            <option value="crisp">ðŸŽ¯ Short & Crisp</option>
-            <option value="professional">ðŸ‘” Professional</option>
+            <option value="enthusiastic">🌟 Enthusiastic</option>
+            <option value="natural">⚡ Natural & Punchy</option>
+            <option value="crisp">🎯 Short & Crisp</option>
+            <option value="professional">👔 Professional</option>
           </select>
         </div>
         <div class="select-group">
-          <label for="sel-lang">ðŸŒ Language</label>
+          <label for="sel-lang">🌐 Language</label>
           <select id="sel-lang">
             <option value="english">English</option>
             <option value="hinglish">Hinglish</option>
@@ -155,7 +155,7 @@
 
       <div id="ai-loader" class="ai-loader hidden">
         <div class="loader-rings"><span></span><span></span><span></span></div>
-        <p class="loader-text">AI is crafting your reviewâ€¦</p>
+        <p class="loader-text">AI is crafting your review…</p>
       </div>
 
       <div id="review-card" class="review-card hidden">
@@ -170,7 +170,7 @@
           </button>
         </div>
         <textarea id="review-text" class="review-textarea" rows="5" aria-label="Edit review text"></textarea>
-        <p class="edit-hint">âœï¸ Feel free to edit before posting</p>
+        <p class="edit-hint">✏️ Feel free to edit before posting</p>
       </div>
 
       <button id="btn-generate" class="btn-primary" disabled type="button">
@@ -184,14 +184,14 @@
     </div>
   </div>
 
-  <!-- â”€â”€ STEP 3: COPY & POST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <!-- ── STEP 3: COPY & POST ────────────────────────────────── -->
   <div id="view-post" class="step" aria-label="Post your review">
     <div class="topbar">
       <button class="topbar-back" onclick="R.goTo('view-build')" aria-label="Go back">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="topbar-title">Ready to Post</span>
-      <span class="topbar-badge">âœ“</span>
+      <span class="topbar-badge">✓</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
 
@@ -204,7 +204,7 @@
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
         </div>
-        <h2 style="font-size: 1.5rem; font-weight: 700; color: #202124; margin-bottom: 8px;">Your Review is Ready! ðŸŽ‰</h2>
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: #202124; margin-bottom: 8px;">Your Review is Ready! 🎉</h2>
         <p style="font-size: 0.95rem; color: #5F6368; line-height: 1.5;">Just one tap to share your experience on Google</p>
       </div>
 
@@ -221,11 +221,11 @@
             <span style="font-weight: 600; font-size: 0.9rem; color: #202124;">Your Google Review</span>
           </div>
           <div style="display: flex; gap: 4px;">
-            <span style="color: #FBBC05; font-size: 1.1rem;">â˜…</span>
-            <span style="color: #FBBC05; font-size: 1.1rem;">â˜…</span>
-            <span style="color: #FBBC05; font-size: 1.1rem;">â˜…</span>
-            <span style="color: #FBBC05; font-size: 1.1rem;">â˜…</span>
-            <span style="color: #FBBC05; font-size: 1.1rem;">â˜…</span>
+            <span style="color: #FBBC05; font-size: 1.1rem;">★</span>
+            <span style="color: #FBBC05; font-size: 1.1rem;">★</span>
+            <span style="color: #FBBC05; font-size: 1.1rem;">★</span>
+            <span style="color: #FBBC05; font-size: 1.1rem;">★</span>
+            <span style="color: #FBBC05; font-size: 1.1rem;">★</span>
           </div>
         </div>
         <p id="preview-text" class="preview-text"></p>
@@ -240,7 +240,7 @@
             <span>Copies + opens Google</span>
           </div>
         </div>
-        <div class="instruction-arrow">â†’</div>
+        <div class="instruction-arrow">→</div>
         <div class="instruction-item">
           <div class="instruction-num">2</div>
           <div class="instruction-text">
@@ -248,12 +248,12 @@
             <span>On Google page</span>
           </div>
         </div>
-        <div class="instruction-arrow">â†’</div>
+        <div class="instruction-arrow">→</div>
         <div class="instruction-item">
           <div class="instruction-num">3</div>
           <div class="instruction-text">
             <strong>Paste & Post</strong>
-            <span>Done! ðŸŽ‰</span>
+            <span>Done! 🎉</span>
           </div>
         </div>
       </div>
@@ -289,14 +289,14 @@
     </div>
   </div>
 
-  <!-- â”€â”€ FEEDBACK SHIELD (1-3 stars) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <!-- ── FEEDBACK SHIELD (1-3 stars) ───────────────────────── -->
   <div id="view-feedback" class="step" aria-label="Private feedback">
     <div class="topbar">
       <button class="topbar-back" onclick="R.goTo('view-rate')" aria-label="Go back">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="topbar-title">Private Feedback</span>
-      <span class="topbar-badge" style="background:#fce8e6;color:#c5221f">ðŸ”’ Confidential</span>
+      <span class="topbar-badge" style="background:#fce8e6;color:#c5221f">🔒 Confidential</span>
     </div>
 
     <div style="padding:24px 20px">
@@ -309,18 +309,18 @@
       </div>
 
       <div class="issue-tags-wrap" id="issue-tags" role="group" aria-label="What went wrong">
-        <button class="issue-tag" data-issue="Wait Time">â³ Wait Time</button>
-        <button class="issue-tag" data-issue="Service">ðŸ‘¤ Service</button>
-        <button class="issue-tag" data-issue="Quality">ðŸ“¦ Quality</button>
-        <button class="issue-tag" data-issue="Cleanliness">ðŸ§¹ Cleanliness</button>
-        <button class="issue-tag" data-issue="Billing">ðŸ’° Billing</button>
-        <button class="issue-tag" data-issue="Other">ðŸ’¬ Other</button>
+        <button class="issue-tag" data-issue="Wait Time">⏳ Wait Time</button>
+        <button class="issue-tag" data-issue="Service">👤 Service</button>
+        <button class="issue-tag" data-issue="Quality">📦 Quality</button>
+        <button class="issue-tag" data-issue="Cleanliness">🧹 Cleanliness</button>
+        <button class="issue-tag" data-issue="Billing">💰 Billing</button>
+        <button class="issue-tag" data-issue="Other">💬 Other</button>
       </div>
 
       <form id="fb-form" class="fb-form" novalidate>
         <div class="form-field">
           <label for="fb-msg">What happened? <span class="req">*</span></label>
-          <textarea id="fb-msg" rows="4" placeholder="Please share details so we can fix this immediatelyâ€¦" required></textarea>
+          <textarea id="fb-msg" rows="4" placeholder="Please share details so we can fix this immediately…" required></textarea>
           <p id="fb-err" class="err-msg hidden">Please describe what happened.</p>
         </div>
         <div class="form-row">
@@ -354,10 +354,10 @@
     </div>
   </div>
 
-  <!-- â”€â”€ DONE SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <!-- ── DONE SCREEN ────────────────────────────────────────── -->
   <div id="view-done" class="step">
     <div class="done-wrap">
-      <div class="done-pulse" id="done-icon">ðŸŽ‰</div>
+      <div class="done-pulse" id="done-icon">🎉</div>
       <h2 class="done-title" id="done-title">Thank you!</h2>
       <p class="done-msg" id="done-msg">Your review supports our team and helps us grow.</p>
       <div class="voucher-card" id="voucher-card" style="display:none">
@@ -374,10 +374,10 @@
   </footer>
 </div>
 
-<div class="copy-toast" id="copy-toast">âœ… Copied to clipboard!</div>
+<div class="copy-toast" id="copy-toast">✅ Copied to clipboard!</div>
 
 <!-- Customer-only badge (optional) -->
-<div class="customer-only-badge">For customers only â€¢ No admin access</div>
+<div class="customer-only-badge">For customers only • No admin access</div>
 
 <script src="assets/libs/qrcode.min.js"></script>
 <script src="assets/libs/confetti.min.js"></script>
@@ -401,4 +401,5 @@
 </script>
 </body>
 </html>
+
 
