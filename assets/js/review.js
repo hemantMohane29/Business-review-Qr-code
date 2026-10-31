@@ -206,43 +206,64 @@ const R = (() => {
     if (hasWhatsApp) {
       // WhatsApp is configured
       if (isMobile) {
-        // MOBILE: Auto-send directly to WhatsApp when user submits
-        if (waBtn) waBtn.style.display = 'none';
+        // MOBILE: Hide WhatsApp button completely, use submit button for WhatsApp
+        if (waBtn) {
+          waBtn.style.setProperty('display', 'none', 'important');
+          waBtn.style.visibility = 'hidden';
+          waBtn.style.height = '0';
+          waBtn.style.overflow = 'hidden';
+        }
         if (emailBtn) {
           emailBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Send Feedback';
           emailBtn.style.background = '#25D366';
           emailBtn.style.color = 'white';
+          emailBtn.style.display = 'flex';
           emailBtn.classList.add('btn-primary');
           emailBtn.classList.remove('btn-outline');
           emailBtn.setAttribute('data-action', 'whatsapp-direct');
         }
       } else {
-        // DESKTOP: Show WhatsApp button
+        // DESKTOP: Show WhatsApp button, hide submit
         if (waBtn) {
+          waBtn.style.removeProperty('display');
           waBtn.style.display = 'flex';
+          waBtn.style.visibility = 'visible';
+          waBtn.style.height = 'auto';
           waBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.78-.877-2.056-.977-.275-.1-.476-.15-.677.15-.2.301-.777.977-.953 1.178-.175.2-.351.226-.652.075s-1.272-.468-2.424-1.494c-.896-.799-1.502-1.786-1.678-2.087-.175-.301-.019-.464.132-.614.135-.135.301-.351.451-.527.151-.176.201-.301.301-.502.1-.2.05-.376-.025-.526-.075-.15-.677-1.632-.927-2.234-.244-.587-.492-.507-.677-.516l-.577-.01c-.2 0-.526.075-.802.376-.276.301-1.053 1.028-1.053 2.507 0 1.479 1.078 2.908 1.228 3.109.15.2 2.122 3.24 5.141 4.544.718.31 1.278.496 1.716.635.722.23 1.38.197 1.9.12.58-.086 1.78-.727 2.03-1.43.25-.702.25-1.304.175-1.43-.075-.125-.276-.2-.577-.35zM12.04 2C6.51 2 2.02 6.49 2.02 12.02c0 1.99.58 3.84 1.59 5.4L2 22.5l5.24-1.57c1.5 1 3.29 1.58 5.2 1.58 5.53 0 10.02-4.49 10.02-10.02C22.46 6.49 17.57 2 12.04 2z"/></svg> Send to WhatsApp';
           waBtn.style.background = '#25D366';
           waBtn.style.color = 'white';
           waBtn.classList.add('btn-primary');
         }
-        if (emailBtn) emailBtn.style.display = 'none';
+        if (emailBtn) {
+          emailBtn.style.setProperty('display', 'none', 'important');
+        }
       }
     } else if (hasEmail) {
       // Only email configured (no WhatsApp)
-      if (waBtn) waBtn.style.display = 'none';
+      if (waBtn) {
+        waBtn.style.setProperty('display', 'none', 'important');
+        waBtn.style.visibility = 'hidden';
+        waBtn.style.height = '0';
+      }
       if (emailBtn) {
         emailBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Send Feedback';
         emailBtn.style.background = '#1A73E8';
+        emailBtn.style.display = 'flex';
         emailBtn.classList.add('btn-primary');
         emailBtn.classList.remove('btn-outline');
         emailBtn.removeAttribute('data-action');
       }
     } else {
       // No WhatsApp AND no email - just show thank you (local storage only)
-      if (waBtn) waBtn.style.display = 'none';
+      if (waBtn) {
+        waBtn.style.setProperty('display', 'none', 'important');
+        waBtn.style.visibility = 'hidden';
+        waBtn.style.height = '0';
+      }
       if (emailBtn) {
         emailBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Submit Feedback';
         emailBtn.style.background = '#1A73E8';
+        emailBtn.style.display = 'flex';
         emailBtn.classList.add('btn-primary');
         emailBtn.classList.remove('btn-outline');
         emailBtn.setAttribute('data-action', 'local-only');
