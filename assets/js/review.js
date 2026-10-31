@@ -37,19 +37,18 @@ const R = (() => {
   function init() {
     const params = new URLSearchParams(location.search);
     const bizId  = params.get('b') || params.get('biz');
-    const biz    = loadBusiness(bizId);
+    
+    // MOBILE-FIRST: No demo business in production
+    // Customer MUST have a valid business ID from QR code
+    const biz = loadBusiness(bizId);
 
-    if (!biz) { 
-      // Create demo business if none exists
-      business = createDemoBusinessIfNeeded();
-      if (!business) {
-        showView('view-setup'); 
-        return;
-      }
-    } else {
-      business = biz;
+    if (!biz) {
+      // Show setup screen - no valid business found
+      showSetupNeeded();
+      return;
     }
 
+    business = biz;
     applyBizToUI();
     incStat('scans');
     showView('view-rate');
@@ -58,39 +57,26 @@ const R = (() => {
     bindButtons();
   }
 
-  function createDemoBusinessIfNeeded() {
-    // Check if we should create a demo business for testing
-    const params = new URLSearchParams(location.search);
-    const demo = params.get('demo');
-    
-    // If no businesses exist at all, create a default demo
-    try {
-      const list = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-      if (list.length === 0) {
-        // Create default demo business
-        const demoBiz = {
-          id: 'demo-business-001',
-          name: 'Demo Business',
-          type: 'restaurant',
-          avatar: '🏪',
-          googleUrl: 'https://g.page/r/EXAMPLE/review',
-          phone: '',
-          email: '',
-          geminiKey: '',
-          createdAt: Date.now()
-        };
-        
-        // Save demo business
-        localStorage.setItem(STORE_KEY, JSON.stringify([demoBiz]));
-        localStorage.setItem(ACTIVE_KEY, demoBiz.id);
-        
-        return demoBiz;
-      }
-      
-      // Return first business if exists
-      return list[0];
-    } catch {
-      return null;
+  function showSetupNeeded() {
+    // Show professional "Invalid QR Code" message for mobile users
+    const setupView = document.getElementById('view-setup');
+    if (setupView) {
+      setupView.style.display = 'flex';
+      setupView.innerHTML = `
+        <div style="text-align:center; padding:60px 20px; max-width:400px; margin:0 auto;">
+          <div style="font-size:4rem; margin-bottom:20px;">🔍</div>
+          <h2 style="font-size:1.4rem; font-weight:700; margin-bottom:12px; color:#202124;">Invalid QR Code</h2>
+          <p style="color:#5F6368; line-height:1.6; margin-bottom:24px;">
+            This review link is not properly configured. Please scan the QR code provided by the business.
+          </p>
+          <p style="font-size:0.85rem; color:#9AA0A6; margin-bottom:20px;">
+            Business owners: Configure your business in the admin panel first.
+          </p>
+          <a href="admin.html" style="display:inline-block; padding:12px 24px; background:#4285F4; color:white; text-decoration:none; border-radius:8px; font-weight:600;">
+            Open Admin Panel
+          </a>
+        </div>
+      `;
     }
   }
 

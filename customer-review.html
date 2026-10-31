@@ -49,15 +49,9 @@
 
 <div class="page">
 
-  <!-- ── SETUP NEEDED (shown when no business configured) ── -->
-    <!-- Setup view - hidden by default, JS creates demo business -->
+  <!-- ── SETUP NEEDED (shown when no valid business ID in URL) ── -->
   <div id="view-setup" class="step" style="display:none;">
-    <div style="text-align:center; padding:60px 20px;">
-      <div style="font-size:3rem; margin-bottom:20px;">⚙️</div>
-      <h2 style="font-size:1.5rem; margin-bottom:10px;">Demo Mode</h2>
-      <p style="color:#666; margin-bottom:20px;">Experience the review system!<br/>Configure your business in the admin panel to go live.</p>
-      <a href="admin.html" style="display:inline-block; padding:12px 24px; background:#4285F4; color:white; text-decoration:none; border-radius:8px;">Open Admin Panel</a>
-    </div>
+    <!-- JavaScript will populate this dynamically with proper error message -->
   </div><!-- ── STEP 1: STAR RATING ───────────────────────────────── -->
   <div id="view-rate" class="step" aria-label="Rate your experience">
     <div class="topbar">
