@@ -199,15 +199,18 @@ const R = (() => {
     
     if (formRow) formRow.style.display = 'none'; // Hide name/contact fields
     
-    // Show WhatsApp as primary action for 3 stars
-    if (business.phone) {
-      // Has WhatsApp configured
+    // Check if WhatsApp OR email is configured
+    const hasWhatsApp = business.phone && business.phone.trim();
+    const hasEmail = business.email && business.email.trim();
+    
+    if (hasWhatsApp) {
+      // WhatsApp is configured
       if (isMobile) {
         // MOBILE: Auto-send directly to WhatsApp when user submits
-        if (waBtn) waBtn.style.display = 'none'; // Hide button
+        if (waBtn) waBtn.style.display = 'none';
         if (emailBtn) {
           emailBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Send Feedback';
-          emailBtn.style.background = '#25D366'; // WhatsApp green
+          emailBtn.style.background = '#25D366';
           emailBtn.style.color = 'white';
           emailBtn.classList.add('btn-primary');
           emailBtn.classList.remove('btn-outline');
@@ -222,10 +225,10 @@ const R = (() => {
           waBtn.style.color = 'white';
           waBtn.classList.add('btn-primary');
         }
-        if (emailBtn) emailBtn.style.display = 'none'; // Hide email on desktop
+        if (emailBtn) emailBtn.style.display = 'none';
       }
-    } else {
-      // No WhatsApp - fall back to email
+    } else if (hasEmail) {
+      // Only email configured (no WhatsApp)
       if (waBtn) waBtn.style.display = 'none';
       if (emailBtn) {
         emailBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Send Feedback';
@@ -233,6 +236,16 @@ const R = (() => {
         emailBtn.classList.add('btn-primary');
         emailBtn.classList.remove('btn-outline');
         emailBtn.removeAttribute('data-action');
+      }
+    } else {
+      // No WhatsApp AND no email - just show thank you (local storage only)
+      if (waBtn) waBtn.style.display = 'none';
+      if (emailBtn) {
+        emailBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Submit Feedback';
+        emailBtn.style.background = '#1A73E8';
+        emailBtn.classList.add('btn-primary');
+        emailBtn.classList.remove('btn-outline');
+        emailBtn.setAttribute('data-action', 'local-only');
       }
     }
     
@@ -245,10 +258,14 @@ const R = (() => {
     const shieldSub = document.querySelector('.shield-sub');
     if (shieldTitle) shieldTitle.textContent = 'Help us improve';
     if (shieldSub) {
-      if (isMobile && business.phone) {
+      if (hasWhatsApp && isMobile) {
         shieldSub.innerHTML = 'Your feedback goes <strong>directly to our WhatsApp</strong>, never to Google';
-      } else {
+      } else if (hasWhatsApp) {
         shieldSub.innerHTML = 'Your quick feedback goes <strong>directly via WhatsApp</strong>, never to Google';
+      } else if (hasEmail) {
+        shieldSub.innerHTML = 'Your quick feedback goes <strong>directly to management</strong>, never to Google';
+      } else {
+        shieldSub.innerHTML = 'Your feedback is recorded <strong>privately</strong>, never goes to Google';
       }
     }
   }
@@ -567,7 +584,9 @@ const R = (() => {
       
       // Check if this is a mobile WhatsApp direct action (3 stars)
       const emailBtn = e.submitter || e.target.querySelector('button[type="submit"]');
-      if (emailBtn?.getAttribute('data-action') === 'whatsapp-direct') {
+      const action = emailBtn?.getAttribute('data-action');
+      
+      if (action === 'whatsapp-direct') {
         // Mobile 3-star: Send directly to WhatsApp
         if (!business.phone) { 
           alert('WhatsApp not configured. Please contact support.'); 
@@ -586,8 +605,20 @@ const R = (() => {
         return;
       }
       
+      if (action === 'local-only') {
+        // No WhatsApp or email - just save locally and show thank you
+        const data = collectFB();
+        console.log('Local feedback saved:', data);
+        // Could save to localStorage if needed in future
+        showDone(false);
+        return;
+      }
+      
       // Regular email submission
-      if (!business.email) { alert('Manager email not configured. Contact admin.'); return; }
+      if (!business.email) { 
+        alert('Manager email not configured. Please add email in admin panel.'); 
+        return; 
+      }
       const data = collectFB();
       const sub  = encodeURIComponent(`Private Feedback: ${rating}★ | ${business.name}`);
       const body = encodeURIComponent(`Business: ${business.name}\nRating: ${rating}★\nCustomer: ${data.name}\nContact: ${data.contact}\nIssues: ${data.issues}\n\nMessage:\n${data.msg}`);
