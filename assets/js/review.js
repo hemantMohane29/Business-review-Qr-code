@@ -546,6 +546,61 @@ const R = (() => {
     } catch { /* silent */ }
   }
 
+  /* ── UTILITIES ────────────────────────────────────────── */
+  function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.style.cssText = `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f44336;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10000;
+      max-width: 90%;
+      text-align: center;
+      font-size: 14px;
+    `;
+    errorDiv.textContent = message;
+    document.body.appendChild(errorDiv);
+    
+    setTimeout(() => {
+      errorDiv.style.opacity = '0';
+      errorDiv.style.transition = 'opacity 0.3s';
+      setTimeout(() => errorDiv.remove(), 300);
+    }, 4000);
+  }
+
+  function showSuccess(message) {
+    const successDiv = document.createElement('div');
+    successDiv.style.cssText = `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4CAF50;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10000;
+      max-width: 90%;
+      text-align: center;
+      font-size: 14px;
+    `;
+    successDiv.textContent = message;
+    document.body.appendChild(successDiv);
+    
+    setTimeout(() => {
+      successDiv.style.opacity = '0';
+      successDiv.style.transition = 'opacity 0.3s';
+      setTimeout(() => successDiv.remove(), 300);
+    }, 3000);
+  }
+
   function showToast(msg = '✅ Copied!') {
     const t = document.getElementById('copy-toast');
     t.textContent = msg;
@@ -641,15 +696,29 @@ const R = (() => {
     // WhatsApp
     document.getElementById('btn-wa')?.addEventListener('click', () => {
       if (!validateFB()) return;
+      
+      // Comprehensive WhatsApp validation
       if (!business.phone) { 
-        alert('Manager WhatsApp not configured. Please add WhatsApp number in admin panel.'); 
+        showError('WhatsApp number not configured. Please contact the business directly.');
         return; 
       }
       
       // Clean and validate phone number
       const cleanPhone = business.phone.replace(/\D/g, '');
-      if (!cleanPhone || cleanPhone.length < 10) {
-        alert('Invalid WhatsApp number format. Please use format: +919876543210'); 
+      
+      // Validation checks
+      if (!cleanPhone) {
+        showError('Invalid WhatsApp number format. Please contact the business.');
+        return;
+      }
+      
+      if (cleanPhone.length < 10) {
+        showError('WhatsApp number too short. Please contact the business to update their configuration.');
+        return;
+      }
+      
+      if (cleanPhone.length > 15) {
+        showError('WhatsApp number too long. Please contact the business to update their configuration.');
         return;
       }
       
@@ -676,17 +745,29 @@ const R = (() => {
       }
       
       const waUrl = `https://wa.me/${cleanPhone}?text=${text}`;
-      console.log('Opening WhatsApp URL:', waUrl);
+      console.log('Opening WhatsApp:', { phone: cleanPhone, url: waUrl.substring(0, 100) + '...' });
       
-      // Try to open WhatsApp
-      const waWindow = window.open(waUrl, '_blank');
-      if (!waWindow || waWindow.closed || typeof waWindow.closed === 'undefined') {
-        // Popup blocked - try direct navigation
-        alert('Please allow popups for WhatsApp to open. Redirecting now...');
-        window.location.href = waUrl;
+      // Enhanced popup blocker handling
+      try {
+        const waWindow = window.open(waUrl, '_blank', 'noopener,noreferrer');
+        
+        // Check if popup was blocked
+        if (!waWindow || waWindow.closed || typeof waWindow.closed === 'undefined') {
+          // Popup blocked - try direct navigation after user confirmation
+          if (confirm('Please allow popups to open WhatsApp. Click OK to continue.')) {
+            window.location.href = waUrl;
+          }
+        } else {
+          // Popup opened successfully
+          showDone(false);
+        }
+      } catch (error) {
+        console.error('WhatsApp open error:', error);
+        // Fallback to direct navigation
+        if (confirm('Unable to open WhatsApp in new window. Open in current tab?')) {
+          window.location.href = waUrl;
+        }
       }
-      
-      showDone(false);
     });
 
     // Email
@@ -701,14 +782,14 @@ const R = (() => {
       if (action === 'whatsapp-direct') {
         // Mobile 3-star: Send directly to WhatsApp
         if (!business.phone) { 
-          alert('WhatsApp not configured. Please add WhatsApp number in admin panel.'); 
+          showError('WhatsApp not configured. Please contact the business directly.');
           return; 
         }
         
         // Clean and validate phone number
         const cleanPhone = business.phone.replace(/\D/g, '');
-        if (!cleanPhone || cleanPhone.length < 10) {
-          alert('Invalid WhatsApp number format. Please use format: +919876543210'); 
+        if (!cleanPhone || cleanPhone.length < 10 || cleanPhone.length > 15) {
+          showError('Invalid WhatsApp number. Please contact the business to update their configuration.');
           return;
         }
         
@@ -722,8 +803,12 @@ const R = (() => {
         );
         
         const waUrl = `https://wa.me/${cleanPhone}?text=${text}`;
-        console.log('Mobile: Opening WhatsApp URL:', waUrl);
+        console.log('Mobile: Opening WhatsApp:', { phone: cleanPhone });
+        
+        // Direct navigation for mobile
         window.location.href = waUrl;
+        
+        // Show success after slight delay
         setTimeout(() => showDone(false), 500);
         return;
       }

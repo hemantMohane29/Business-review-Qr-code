@@ -377,60 +377,133 @@ const A = (() => {
     }
 
     const url = getReviewUrl(biz.id);
+    
+    // Validate URL before generating QR
+    if (!url || url.length < 10) {
+      container.innerHTML = '<p style="color:#f44336;font-size:.82rem;padding:20px;text-align:center">⚠️ Invalid URL. Please check business configuration.</p>';
+      return;
+    }
 
     document.getElementById('qr-biz-label').textContent = biz.name;
     document.getElementById('qr-url-label').textContent  = url;
 
-    if (typeof QRCode !== 'undefined') {
-      qrInstance = new QRCode(container, {
-        text: url, width: 220, height: 220,
-        colorDark: '#000', colorLight: '#fff',
-        correctLevel: QRCode.CorrectLevel.H
-      });
+    try {
+      if (typeof QRCode !== 'undefined') {
+        qrInstance = new QRCode(container, {
+          text: url, 
+          width: 220, 
+          height: 220,
+          colorDark: '#000', 
+          colorLight: '#fff',
+          correctLevel: QRCode.CorrectLevel.H  // High error correction for better scanning
+        });
+        
+        console.log('QR Code generated successfully:', { 
+          businessId: biz.id, 
+          businessName: biz.name,
+          urlLength: url.length 
+        });
+      } else {
+        container.innerHTML = '<p style="color:#f44336;font-size:.82rem;padding:20px;text-align:center">⚠️ QR library not loaded. Please refresh the page.</p>';
+      }
+    } catch (error) {
+      console.error('QR generation error:', error);
+      container.innerHTML = '<p style="color:#f44336;font-size:.82rem;padding:20px;text-align:center">⚠️ Failed to generate QR code. Please try again.</p>';
     }
   }
 
   function downloadQR() {
     const biz = getActive();
-    if (!biz) { toast('No active business to download QR for.', 'error'); return; }
-
-    // Try canvas first (higher quality), fall back to img
-    const canvas = document.querySelector('#qr-container canvas');
-    const img    = document.querySelector('#qr-container img');
-
-    let dataUrl;
-    if (canvas) {
-      dataUrl = canvas.toDataURL('image/png');
-    } else if (img && img.src) {
-      dataUrl = img.src;
-    } else {
-      toast('QR code not ready yet. Try again.', 'error');
-      return;
+    if (!biz) { 
+      toast('No active business to download QR for.', 'error'); 
+      return; 
     }
 
-    const name = biz.name.replace(/\s+/g, '_') || 'QR';
-    const a = Object.assign(document.createElement('a'), {
-      href: dataUrl,
-      download: `${name}_QR_Code.png`
-    });
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    toast('QR code downloaded!', 'success');
+    try {
+      // Try canvas first (higher quality), fall back to img
+      const canvas = document.querySelector('#qr-container canvas');
+      const img    = document.querySelector('#qr-container img');
+
+      let dataUrl;
+      if (canvas) {
+        dataUrl = canvas.toDataURL('image/png');
+      } else if (img && img.src) {
+        dataUrl = img.src;
+      } else {
+        toast('QR code not ready yet. Please wait and try again.', 'error');
+        return;
+      }
+
+      // Validate data URL
+      if (!dataUrl || !dataUrl.startsWith('data:image')) {
+        toast('Invalid QR code data. Please regenerate.', 'error');
+        return;
+      }
+
+      const name = biz.name.replace(/[^a-zA-Z0-9]/g, '_') || 'QR';
+      const timestamp = new Date().toISOString().split('T')[0];
+      const a = Object.assign(document.createElement('a'), {
+        href: dataUrl,
+        download: `${name}_QR_${timestamp}.png`
+      });
+      
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      toast('QR code downloaded successfully!', 'success');
+      console.log('QR downloaded:', { business: biz.name, filename: a.download });
+    } catch (error) {
+      console.error('QR download error:', error);
+      toast('Failed to download QR code. Please try again.', 'error');
+    }
   }
 
   function copyReviewLink() {
     const biz = getActive();
-    if (!biz) { toast('No active business.', 'error'); return; }
-    const url = getReviewUrl(biz.id);
-    copyText(url);
-    toast('Review link copied to clipboard!', 'success');
+    if (!biz) { 
+      toast('No active business.', 'error'); 
+      return; 
+    }
+    
+    try {
+      const url = getReviewUrl(biz.id);
+      
+      if (!url || url.length < 10) {
+        toast('Invalid review URL. Please check business configuration.', 'error');
+        return;
+      }
+      
+      copyText(url);
+      toast('Review link copied to clipboard!', 'success');
+      console.log('Review link copied:', { businessId: biz.id, url });
+    } catch (error) {
+      console.error('Copy link error:', error);
+      toast('Failed to copy link. Please try again.', 'error');
+    }
   }
 
   function testReviewLink() {
     const biz = getActive();
-    if (!biz) { toast('No active business.', 'error'); return; }
-    window.open(getReviewUrl(biz.id), '_blank');
+    if (!biz) { 
+      toast('No active business.', 'error'); 
+      return; 
+    }
+    
+    try {
+      const url = getReviewUrl(biz.id);
+      
+      if (!url || url.length < 10) {
+        toast('Invalid review URL. Please check business configuration.', 'error');
+        return;
+      }
+      
+      window.open(url, '_blank', 'noopener,noreferrer');
+      console.log('Testing review link:', { businessId: biz.id, url });
+    } catch (error) {
+      console.error('Test link error:', error);
+      toast('Failed to open test link. Please try again.', 'error');
+    }
   }
 
   /* ── SETTINGS ─────────────────────────────────────────── */
