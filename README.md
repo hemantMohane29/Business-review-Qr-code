@@ -2,7 +2,7 @@
 
 **AI-Powered Google Review Management System** - Get more 5-star reviews while protecting your reputation!
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live-green)](https://your-demo-url.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Demo-Live-green)](https://businessreviewqrcode.vercel.app)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
@@ -63,6 +63,12 @@ python -m http.server 3000
 ```
 http://localhost:3000/customer-review.html
 ```
+
+### 🌐 Live Demo
+**Production URL:** https://businessreviewqrcode.vercel.app/
+
+- **Customer Review Page:** https://businessreviewqrcode.vercel.app/customer-review.html
+- **Admin Dashboard:** https://businessreviewqrcode.vercel.app/admin.html
 
 ---
 
