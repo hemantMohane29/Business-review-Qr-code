@@ -1,0 +1,404 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title id="page-title">Share Your Experience</title>
+  <meta name="robots" content="noindex"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/review.css"/>
+  <style>
+    /* IMPORTANT: Hide any admin elements if they accidentally appear */
+    .admin-toggle,
+    .admin-button,
+    .admin-panel,
+    [data-admin],
+    #admin-btn,
+    #admin-toggle,
+    .setup-link,
+    .config-btn {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    
+    /* Customer-only styles */
+    body {
+      background: #F8F9FA;
+    }
+    
+    .customer-only-badge {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: #9AA0A6;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 20px;
+      z-index: 1000;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="customer-view-only">
+
+<div class="page">
+
+  <!-- â”€â”€ SETUP NEEDED (shown when no business configured) â”€â”€ -->
+  <div id="view-setup" class="step active setup-needed" style="padding-top:60px">
+    <div class="setup-icon">âš™ï¸</div>
+    <h2 class="setup-title">Not Configured Yet</h2>
+    <p class="setup-msg">This review link hasn't been set up yet.<br/>Please contact the business owner.</p>
+  </div>
+
+  <!-- â”€â”€ STEP 1: STAR RATING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <div id="view-rate" class="step" aria-label="Rate your experience">
+    <div class="topbar">
+      <div class="topbar-badge" aria-label="Google Reviews">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Google Reviews
+      </div>
+      <span class="topbar-title"></span>
+      <span class="topbar-badge">1 / 3</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:33%"></div></div>
+
+    <div style="padding:28px 20px">
+      <div class="biz-hero">
+        <div class="biz-avatar" id="r-avatar">âœ¨</div>
+        <h1 class="biz-name">How was your visit to<br><span id="r-biz-name">â€¦</span>?</h1>
+        <p class="biz-category" id="r-category"></p>
+      </div>
+
+      <div class="rating-card">
+        <p class="rating-card-label">Tap a star to rate your experience</p>
+        <div class="stars-row" id="stars-row" role="group" aria-label="Star rating">
+          <button class="star-btn" data-v="1" aria-label="1 star â€“ Terrible" type="button">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </button>
+          <button class="star-btn" data-v="2" aria-label="2 stars â€“ Poor" type="button">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </button>
+          <button class="star-btn" data-v="3" aria-label="3 stars â€“ Average" type="button">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </button>
+          <button class="star-btn" data-v="4" aria-label="4 stars â€“ Good" type="button">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </button>
+          <button class="star-btn" data-v="5" aria-label="5 stars â€“ Excellent" type="button">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </button>
+        </div>
+        <div class="rating-label" id="rating-label" aria-live="polite"></div>
+      </div>
+
+      <div class="feature-strip">
+        <div class="feature-chip">âš¡ 30-second review</div>
+        <div class="feature-chip">âœ¨ AI-assisted</div>
+        <div class="feature-chip">ðŸ”’ Protected</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- â”€â”€ STEP 2: AI REVIEW BUILDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <div id="view-build" class="step" aria-label="Build your review">
+    <div class="topbar">
+      <button class="topbar-back" onclick="R.goTo('view-rate')" aria-label="Go back">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="topbar-title">Build Your Review</span>
+      <span class="topbar-badge" id="step2-rating-badge"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:66%"></div></div>
+
+    <div style="padding:24px 20px">
+      <h2 class="section-heading">What did you enjoy most?</h2>
+      <p class="section-sub">Select highlights â€” AI will craft your personalised review</p>
+
+      <div class="chips-wrap" id="chips-wrap" role="group" aria-label="Select highlights"></div>
+
+      <div class="add-custom-row">
+        <input type="text" id="custom-kw" placeholder="Add your own highlightâ€¦" maxlength="50" aria-label="Custom highlight"/>
+        <button class="btn-add-kw" onclick="R.addCustomChip()" type="button">+ Add</button>
+      </div>
+
+      <div class="options-row">
+        <div class="select-group">
+          <label for="sel-tone">âœï¸ Tone</label>
+          <select id="sel-tone">
+            <option value="enthusiastic">ðŸŒŸ Enthusiastic</option>
+            <option value="natural">âš¡ Natural & Punchy</option>
+            <option value="crisp">ðŸŽ¯ Short & Crisp</option>
+            <option value="professional">ðŸ‘” Professional</option>
+          </select>
+        </div>
+        <div class="select-group">
+          <label for="sel-lang">ðŸŒ Language</label>
+          <select id="sel-lang">
+            <option value="english">English</option>
+            <option value="hinglish">Hinglish</option>
+            <option value="spanish">Spanish</option>
+            <option value="french">French</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="ai-loader" class="ai-loader hidden">
+        <div class="loader-rings"><span></span><span></span><span></span></div>
+        <p class="loader-text">AI is crafting your reviewâ€¦</p>
+      </div>
+
+      <div id="review-card" class="review-card hidden">
+        <div class="review-card-header">
+          <span class="review-card-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Your Google Review
+          </span>
+          <button class="btn-regen" id="btn-regen" type="button">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+            Regenerate
+          </button>
+        </div>
+        <textarea id="review-text" class="review-textarea" rows="5" aria-label="Edit review text"></textarea>
+        <p class="edit-hint">âœï¸ Feel free to edit before posting</p>
+      </div>
+
+      <button id="btn-generate" class="btn-primary" disabled type="button">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Generate Review with AI
+      </button>
+      <button id="btn-to-post" class="btn-primary hidden" type="button" style="background:#34A853">
+        Continue to Post
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- â”€â”€ STEP 3: COPY & POST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <div id="view-post" class="step" aria-label="Post your review">
+    <div class="topbar">
+      <button class="topbar-back" onclick="R.goTo('view-build')" aria-label="Go back">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="topbar-title">Ready to Post</span>
+      <span class="topbar-badge">âœ“</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+
+    <div style="padding:24px 20px; max-width: 440px; margin: 0 auto;">
+      
+      <!-- Success Icon -->
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="width: 80px; height: 80px; margin: 0 auto 16px; background: linear-gradient(135deg, #34A853 0%, #0F9D58 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(52, 168, 83, 0.3);">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: #202124; margin-bottom: 8px;">Your Review is Ready! ðŸŽ‰</h2>
+        <p style="font-size: 0.95rem; color: #5F6368; line-height: 1.5;">Just one tap to share your experience on Google</p>
+      </div>
+
+      <!-- Review Preview Card -->
+      <div class="review-preview-card">
+        <div class="preview-card-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            <span style="font-weight: 600; font-size: 0.9rem; color: #202124;">Your Google Review</span>
+          </div>
+          <div style="display: flex; gap: 4px;">
+            <span style="color: #FBBC05; font-size: 1.1rem;">â˜…</span>
+            <span style="color: #FBBC05; font-size: 1.1rem;">â˜…</span>
+            <span style="color: #FBBC05; font-size: 1.1rem;">â˜…</span>
+            <span style="color: #FBBC05; font-size: 1.1rem;">â˜…</span>
+            <span style="color: #FBBC05; font-size: 1.1rem;">â˜…</span>
+          </div>
+        </div>
+        <p id="preview-text" class="preview-text"></p>
+      </div>
+
+      <!-- Visual Step-by-Step Instructions -->
+      <div class="instructions-visual">
+        <div class="instruction-item">
+          <div class="instruction-num">1</div>
+          <div class="instruction-text">
+            <strong>Tap button below</strong>
+            <span>Copies + opens Google</span>
+          </div>
+        </div>
+        <div class="instruction-arrow">â†’</div>
+        <div class="instruction-item">
+          <div class="instruction-num">2</div>
+          <div class="instruction-text">
+            <strong>Long-press text box</strong>
+            <span>On Google page</span>
+          </div>
+        </div>
+        <div class="instruction-arrow">â†’</div>
+        <div class="instruction-item">
+          <div class="instruction-num">3</div>
+          <div class="instruction-text">
+            <strong>Paste & Post</strong>
+            <span>Done! ðŸŽ‰</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main CTA Button -->
+      <button id="btn-google" class="btn-google-mega" type="button">
+        <div class="btn-mega-content">
+          <div class="btn-mega-icon">
+            <svg viewBox="0 0 24 24" width="32" height="32">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+          </div>
+          <div class="btn-mega-text">
+            <div class="btn-mega-title">Copy & Open Google Reviews</div>
+            <div class="btn-mega-sub">Tap to copy and open in one click</div>
+          </div>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="white" stroke="white" stroke-width="3" class="btn-mega-arrow">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </button>
+
+      <!-- Business Name Badge -->
+      <div class="posting-to-badge">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+        Posting to <strong id="post-biz-name"></strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- â”€â”€ FEEDBACK SHIELD (1-3 stars) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <div id="view-feedback" class="step" aria-label="Private feedback">
+    <div class="topbar">
+      <button class="topbar-back" onclick="R.goTo('view-rate')" aria-label="Go back">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="topbar-title">Private Feedback</span>
+      <span class="topbar-badge" style="background:#fce8e6;color:#c5221f">ðŸ”’ Confidential</span>
+    </div>
+
+    <div style="padding:24px 20px">
+      <div class="shield-hero">
+        <div class="shield-icon-wrap">
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h2 class="shield-title">We want to make this right</h2>
+        <p class="shield-sub">Your message goes <strong>directly to management</strong>, never to Google</p>
+      </div>
+
+      <div class="issue-tags-wrap" id="issue-tags" role="group" aria-label="What went wrong">
+        <button class="issue-tag" data-issue="Wait Time">â³ Wait Time</button>
+        <button class="issue-tag" data-issue="Service">ðŸ‘¤ Service</button>
+        <button class="issue-tag" data-issue="Quality">ðŸ“¦ Quality</button>
+        <button class="issue-tag" data-issue="Cleanliness">ðŸ§¹ Cleanliness</button>
+        <button class="issue-tag" data-issue="Billing">ðŸ’° Billing</button>
+        <button class="issue-tag" data-issue="Other">ðŸ’¬ Other</button>
+      </div>
+
+      <form id="fb-form" class="fb-form" novalidate>
+        <div class="form-field">
+          <label for="fb-msg">What happened? <span class="req">*</span></label>
+          <textarea id="fb-msg" rows="4" placeholder="Please share details so we can fix this immediatelyâ€¦" required></textarea>
+          <p id="fb-err" class="err-msg hidden">Please describe what happened.</p>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="fb-name">Your Name</label>
+            <input type="text" id="fb-name" placeholder="Optional"/>
+          </div>
+          <div class="form-field">
+            <label for="fb-contact">Contact</label>
+            <input type="text" id="fb-contact" placeholder="Phone or email"/>
+          </div>
+        </div>
+
+        <button type="button" class="btn-whatsapp" id="btn-wa">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.78-.877-2.056-.977-.275-.1-.476-.15-.677.15-.2.301-.777.977-.953 1.178-.175.2-.351.226-.652.075s-1.272-.468-2.424-1.494c-.896-.799-1.502-1.786-1.678-2.087-.175-.301-.019-.464.132-.614.135-.135.301-.351.451-.527.151-.176.201-.301.301-.502.1-.2.05-.376-.025-.526-.075-.15-.677-1.632-.927-2.234-.244-.587-.492-.507-.677-.516l-.577-.01c-.2 0-.526.075-.802.376-.276.301-1.053 1.028-1.053 2.507 0 1.479 1.078 2.908 1.228 3.109.15.2 2.122 3.24 5.141 4.544.718.31 1.278.496 1.716.635.722.23 1.38.197 1.9.12.58-.086 1.78-.727 2.03-1.43.25-.702.25-1.304.175-1.43-.075-.125-.276-.2-.577-.35zM12.04 2C6.51 2 2.02 6.49 2.02 12.02c0 1.99.58 3.84 1.59 5.4L2 22.5l5.24-1.57c1.5 1 3.29 1.58 5.2 1.58 5.53 0 10.02-4.49 10.02-10.02C22.46 6.49 17.57 2 12.04 2z"/></svg>
+          Alert Manager via WhatsApp
+        </button>
+        <button type="submit" class="btn-outline">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Send via Email
+        </button>
+      </form>
+
+      <div class="privacy-badge">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+        <div>
+          <strong>Zero Public Impact</strong>
+          <p>This message is 100% private. Nothing is posted publicly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- â”€â”€ DONE SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <div id="view-done" class="step">
+    <div class="done-wrap">
+      <div class="done-pulse" id="done-icon">ðŸŽ‰</div>
+      <h2 class="done-title" id="done-title">Thank you!</h2>
+      <p class="done-msg" id="done-msg">Your review supports our team and helps us grow.</p>
+      <div class="voucher-card" id="voucher-card" style="display:none">
+        <div class="voucher-label">Manager's Goodwill Gift</div>
+        <div class="voucher-code">CODE: <strong id="voucher-code">CARE15</strong></div>
+        <p class="voucher-note">15% off your next visit. Show this screen at checkout.</p>
+      </div>
+      <button class="btn-outline" id="btn-done" style="max-width:200px">Done</button>
+    </div>
+  </div>
+
+  <footer class="review-footer" id="r-footer">
+    Powered by <strong>Zone Digi Tech</strong>
+  </footer>
+</div>
+
+<div class="copy-toast" id="copy-toast">âœ… Copied to clipboard!</div>
+
+<!-- Customer-only badge (optional) -->
+<div class="customer-only-badge">For customers only â€¢ No admin access</div>
+
+<script src="assets/libs/qrcode.min.js"></script>
+<script src="assets/libs/confetti.min.js"></script>
+<script src="assets/js/review.js"></script>
+<script>
+  // Extra security: Block any admin access attempts
+  document.addEventListener('DOMContentLoaded', () => {
+    // Remove any admin elements that might have loaded
+    document.querySelectorAll('.admin-toggle, .admin-button, .admin-panel, [data-admin]').forEach(el => {
+      el.remove();
+    });
+    
+    // Block keyboard shortcuts for admin
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        return false;
+      }
+    });
+  });
+</script>
+</body>
+</html>
+
