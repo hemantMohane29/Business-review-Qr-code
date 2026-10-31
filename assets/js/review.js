@@ -170,8 +170,15 @@ const R = (() => {
             loadChips();
             document.getElementById('step2-rating-badge').textContent = '⭐'.repeat(rating);
             goTo('view-build');
-          } else {
+          } else if (rating === 3) {
+            // 3 stars: Quick feedback - only reason, no name/contact
             incStat('shielded');
+            setupQuickFeedback();
+            goTo('view-feedback');
+          } else {
+            // 1-2 stars: Full feedback form
+            incStat('shielded');
+            setupFullFeedback();
             document.getElementById('shield-star-text') &&
               (document.getElementById('shield-star-text').textContent = `${rating} star${rating > 1 ? 's' : ''}`);
             goTo('view-feedback');
@@ -179,6 +186,59 @@ const R = (() => {
         }, 420);
       });
     });
+  }
+
+  /* ── FEEDBACK MODES ───────────────────────────────────── */
+  function setupQuickFeedback() {
+    // 3 stars: Only reason required, auto-send
+    const formRow = document.querySelector('#view-feedback .form-row');
+    const waBtn = document.getElementById('btn-wa');
+    const emailBtn = document.querySelector('#fb-form button[type="submit"]');
+    const msgTextarea = document.getElementById('fb-msg');
+    
+    if (formRow) formRow.style.display = 'none'; // Hide name/contact fields
+    if (waBtn) waBtn.style.display = 'none'; // Hide WhatsApp button
+    if (emailBtn) {
+      emailBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Send Feedback';
+      emailBtn.style.background = '#1A73E8';
+      emailBtn.classList.add('btn-primary');
+      emailBtn.classList.remove('btn-outline');
+    }
+    if (msgTextarea) {
+      msgTextarea.placeholder = 'What could we improve? Your feedback helps us get better...';
+    }
+    
+    // Update heading for 3 stars
+    const shieldTitle = document.querySelector('.shield-title');
+    const shieldSub = document.querySelector('.shield-sub');
+    if (shieldTitle) shieldTitle.textContent = 'Help us improve';
+    if (shieldSub) shieldSub.innerHTML = 'Your quick feedback goes <strong>directly to management</strong>, never to Google';
+  }
+
+  function setupFullFeedback() {
+    // 1-2 stars: Full form with name/contact
+    const formRow = document.querySelector('#view-feedback .form-row');
+    const waBtn = document.getElementById('btn-wa');
+    const emailBtn = document.querySelector('#fb-form button[type="submit"]');
+    const msgTextarea = document.getElementById('fb-msg');
+    
+    if (formRow) formRow.style.display = 'flex'; // Show name/contact fields
+    if (waBtn) waBtn.style.display = 'flex'; // Show WhatsApp button
+    if (emailBtn) {
+      emailBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Send via Email';
+      emailBtn.style.background = '';
+      emailBtn.classList.remove('btn-primary');
+      emailBtn.classList.add('btn-outline');
+    }
+    if (msgTextarea) {
+      msgTextarea.placeholder = 'Please share details so we can fix this immediately…';
+    }
+    
+    // Update heading for 1-2 stars
+    const shieldTitle = document.querySelector('.shield-title');
+    const shieldSub = document.querySelector('.shield-sub');
+    if (shieldTitle) shieldTitle.textContent = 'We want to make this right';
+    if (shieldSub) shieldSub.innerHTML = 'Your message goes <strong>directly to management</strong>, never to Google';
   }
 
   /* ── KEYWORD CHIPS ────────────────────────────────────── */
@@ -473,9 +533,12 @@ const R = (() => {
 
   function collectFB() {
     const tags = Array.from(document.querySelectorAll('.issue-tag.active')).map(t => t.dataset.issue);
+    const nameField = document.getElementById('fb-name');
+    const contactField = document.getElementById('fb-contact');
+    
     return {
-      name: document.getElementById('fb-name')?.value || 'Anonymous',
-      contact: document.getElementById('fb-contact')?.value || 'Not provided',
+      name: (nameField && nameField.value.trim()) || 'Anonymous',
+      contact: (contactField && contactField.value.trim()) || 'Not provided',
       issues: tags.length ? tags.join(', ') : 'General',
       msg: document.getElementById('fb-msg').value.trim()
     };
