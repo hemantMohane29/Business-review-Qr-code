@@ -168,12 +168,26 @@ const A = (() => {
   }
 
   function getReviewUrl(bizId) {
-    // Use clean, simple URLs with just business ID
-    // Customer's device will load data from localStorage or fallback to embedded data
+    // MOBILE-FIRST: Embed business data in URL for cross-device compatibility
+    // Mobile devices don't have access to desktop's localStorage
     const base = location.origin + location.pathname.replace(/[^/]*$/, REVIEW_PAGE);
+    const biz = businesses.find(b => b.id === bizId);
     
-    // Simple URL with just business ID (preferred)
-    let url = `${base}?b=${encodeURIComponent(bizId)}`;
+    if (!biz) return base;
+    
+    // Encode minimal business data in URL for mobile devices
+    const data = {
+      id: biz.id,
+      n: biz.name,           // name
+      t: biz.type,           // type
+      g: biz.googleUrl,      // google URL
+      p: biz.phone || '',    // phone
+      e: biz.email || ''     // email
+    };
+    
+    // Base64 encode to keep URL cleaner and avoid special character issues
+    const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
+    let url = `${base}?d=${encoded}`;
     
     return url;
   }

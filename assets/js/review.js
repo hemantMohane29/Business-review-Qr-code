@@ -36,11 +36,15 @@ const R = (() => {
   /* ── INIT ─────────────────────────────────────────────── */
   function init() {
     const params = new URLSearchParams(location.search);
-    const bizId  = params.get('b') || params.get('biz');
     
-    // MOBILE-FIRST: No demo business in production
-    // Customer MUST have a valid business ID from QR code
-    const biz = loadBusiness(bizId);
+    // Try loading from URL data first (for mobile cross-device compatibility)
+    let biz = loadBusinessFromUrl(params);
+    
+    // Fallback to localStorage (for same-device usage)
+    if (!biz) {
+      const bizId = params.get('b') || params.get('biz');
+      biz = loadBusiness(bizId);
+    }
 
     if (!biz) {
       // Show setup screen - no valid business found
@@ -55,6 +59,32 @@ const R = (() => {
     bindRating();
     bindForm();
     bindButtons();
+  }
+
+  function loadBusinessFromUrl(params) {
+    // Load business data from URL parameter (for mobile devices)
+    try {
+      const encoded = params.get('d');
+      if (!encoded) return null;
+      
+      const decoded = decodeURIComponent(atob(encoded));
+      const data = JSON.parse(decoded);
+      
+      // Convert short keys back to full business object
+      return {
+        id: data.id,
+        name: data.n,
+        type: data.t || 'general',
+        googleUrl: data.g,
+        phone: data.p || '',
+        email: data.e || '',
+        avatar: getAvatar(data.t || 'general'),
+        apiKey: '' // Not included in URL for security
+      };
+    } catch (e) {
+      console.warn('Failed to load business from URL:', e);
+      return null;
+    }
   }
 
   function showSetupNeeded() {
