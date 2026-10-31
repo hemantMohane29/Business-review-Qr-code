@@ -1,39 +1,39 @@
-﻿/* =========================================================
-   SMARTREVIEW â€” CUSTOMER REVIEW FLOW
+/* =========================================================
+   SMARTREVIEW — CUSTOMER REVIEW FLOW
    review.js  |  v4.0  |  No dependencies except qrcode/confetti
    ========================================================= */
 'use strict';
 
 const R = (() => {
 
-  /* â”€â”€ CONSTANTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── CONSTANTS ────────────────────────────────────────── */
   const STORE_KEY   = 'sr_businesses_v4';
   const ACTIVE_KEY  = 'sr_active_v4';
   const STAT_PREFIX = 'sr_stat_';
 
-  const STAR_LABELS = ['','Terrible ðŸ˜ž','Poor ðŸ˜•','Okay ðŸ˜','Good ðŸ˜Š','Excellent ðŸ¤©'];
+  const STAR_LABELS = ['','Terrible 😞','Poor 😕','Okay 😐','Good 😊','Excellent 🤩'];
   const STAR_COLORS = ['','#EA4335','#FA7B17','#F9AB00','#34A853','#1A73E8'];
 
   const KEYWORDS = {
-    restaurant:['Mouthwatering Food ðŸ²','Attentive Staff ðŸ˜Š','Beautiful Interior âœ¨','Fast Service âš¡','Authentic Flavours ðŸŒ¶ï¸','Generous Portions ðŸ¥˜','Great Drinks ðŸ¹','Family Friendly ðŸ‘¨â€ðŸ‘©â€ðŸ‘§','Spotless Hygiene ðŸ§¼','Outstanding Experience â­'],
-    cafe:      ['Amazing Coffee â˜•','Delicious Pastries ðŸ¥','Cozy Ambiance ðŸ›‹ï¸','Friendly Baristas âš¡','Fresh Ingredients ðŸŒ±','Great Work Spot ðŸ’»','Speedy Service âœ¨','Good Value ðŸ’°','Must-Visit ðŸ“','Always Come Back ðŸ”„'],
-    salon:     ['Skilled Stylist âœ‚ï¸','Relaxing Experience ðŸ’†','Spotless & Hygienic âœ¨','Premium Products ðŸ§´','Polite Staff ðŸ˜Š','No Wait Time â±ï¸','Great Hair Result ðŸ’Ž','Thorough Consultation ðŸ’¬','Worth Every Rupee ðŸ’°','My Go-To Place ðŸ†'],
-    clinic:    ['Caring Doctor ðŸ‘¨â€âš•ï¸','Pain-Free Treatment ðŸ©¹','Sparkling Clean ðŸ¥','Clear Explanations ðŸ’¬','Warm Receptionist ðŸ˜Š','Modern Equipment ðŸ”¬','On-Time ðŸ•','Extremely Professional ðŸ†','Felt Completely at Ease ðŸ˜Œ','Highly Recommended ðŸ‘'],
-    gym:       ['Top Equipment ðŸ‹ï¸','Motivating Trainers ðŸ¥‡','High-Energy Vibe âš¡','Clean Locker Rooms ðŸš¿','Great Community ðŸ‘¥','Personalised Plans ðŸŽ¯','Spacious & Ventilated ðŸ’¨','Visible Results ðŸ’ª','Fair Pricing ðŸ’°','Best Gym Around â­'],
-    retail:    ['Trendy Collection ðŸ‘—','Helpful Staff ðŸ˜Š','Great Deals ðŸ·ï¸','Top Quality ðŸ’Ž','Smooth Checkout âš¡','Beautiful Layout ðŸ¬','Found Exactly What I Needed ðŸŽ¯','Easy Returns ðŸ”„','Enjoyable Shopping ðŸ›ï¸','Will Shop Again â­'],
-    hotel:     ['Immaculate Rooms ðŸ›ï¸','Outstanding Hospitality ðŸ›Žï¸','Excellent Breakfast ðŸ³','Breathtaking Views ðŸŒ„','Perfect Location ðŸ“','Fast Room Service âš¡','Super Comfy Beds â˜ï¸','Peaceful & Quiet ðŸŒ¿','5-Star Experience ðŸŒŸ','Booking Again ðŸ”‘'],
-    auto:      ['Expert Mechanics ðŸ”§','Honest Pricing ðŸ’°','Quick Turnaround â±ï¸','Smooth Drive After ðŸŽï¸','Transparent Report ðŸ“‹','Car Washed & Clean ðŸ§¼','Genuine Parts âš™ï¸','Friendly Team ðŸ˜Š','Trustworthy Garage ðŸ›¡ï¸','100% Reliable ðŸ‘'],
-    general:   ['Outstanding Service ðŸ†','Warm & Friendly ðŸ˜Š','Prompt & Efficient âš¡','High-Quality Work ðŸ’Ž','Reasonable Prices ðŸ’°','Exceeded Expectations ðŸŽ¯','Attention to Detail ðŸ”','Smooth Experience âœ¨','Very Professional ðŸ‘”','Wholeheartedly Recommend ðŸ‘'],
+    restaurant:['Mouthwatering Food 🍲','Attentive Staff 😊','Beautiful Interior ✨','Fast Service ⚡','Authentic Flavours 🌶️','Generous Portions 🥘','Great Drinks 🍹','Family Friendly 👨‍👩‍👧','Spotless Hygiene 🧼','Outstanding Experience ⭐'],
+    cafe:      ['Amazing Coffee ☕','Delicious Pastries 🥐','Cozy Ambiance 🛋️','Friendly Baristas ⚡','Fresh Ingredients 🌱','Great Work Spot 💻','Speedy Service ✨','Good Value 💰','Must-Visit 📍','Always Come Back 🔄'],
+    salon:     ['Skilled Stylist ✂️','Relaxing Experience 💆','Spotless & Hygienic ✨','Premium Products 🧴','Polite Staff 😊','No Wait Time ⏱️','Great Hair Result 💎','Thorough Consultation 💬','Worth Every Rupee 💰','My Go-To Place 🏆'],
+    clinic:    ['Caring Doctor 👨‍⚕️','Pain-Free Treatment 🩹','Sparkling Clean 🏥','Clear Explanations 💬','Warm Receptionist 😊','Modern Equipment 🔬','On-Time 🕐','Extremely Professional 🏆','Felt Completely at Ease 😌','Highly Recommended 👍'],
+    gym:       ['Top Equipment 🏋️','Motivating Trainers 🥇','High-Energy Vibe ⚡','Clean Locker Rooms 🚿','Great Community 👥','Personalised Plans 🎯','Spacious & Ventilated 💨','Visible Results 💪','Fair Pricing 💰','Best Gym Around ⭐'],
+    retail:    ['Trendy Collection 👗','Helpful Staff 😊','Great Deals 🏷️','Top Quality 💎','Smooth Checkout ⚡','Beautiful Layout 🏬','Found Exactly What I Needed 🎯','Easy Returns 🔄','Enjoyable Shopping 🛍️','Will Shop Again ⭐'],
+    hotel:     ['Immaculate Rooms 🛏️','Outstanding Hospitality 🛎️','Excellent Breakfast 🍳','Breathtaking Views 🌄','Perfect Location 📍','Fast Room Service ⚡','Super Comfy Beds ☁️','Peaceful & Quiet 🌿','5-Star Experience 🌟','Booking Again 🔑'],
+    auto:      ['Expert Mechanics 🔧','Honest Pricing 💰','Quick Turnaround ⏱️','Smooth Drive After 🏎️','Transparent Report 📋','Car Washed & Clean 🧼','Genuine Parts ⚙️','Friendly Team 😊','Trustworthy Garage 🛡️','100% Reliable 👍'],
+    general:   ['Outstanding Service 🏆','Warm & Friendly 😊','Prompt & Efficient ⚡','High-Quality Work 💎','Reasonable Prices 💰','Exceeded Expectations 🎯','Attention to Detail 🔍','Smooth Experience ✨','Very Professional 👔','Wholeheartedly Recommend 👍'],
   };
 
-  /* â”€â”€ STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── STATE ────────────────────────────────────────────── */
   let business   = null;   // active business config
   let rating     = 0;
   let keywords   = [];
   let review     = '';
   let stepStack  = [];
 
-  /* â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── INIT ─────────────────────────────────────────────── */
   function init() {
     const params = new URLSearchParams(location.search);
     const bizId  = params.get('b') || params.get('biz');
@@ -95,37 +95,13 @@ const R = (() => {
   }
 
   function loadBusiness(id) {
-    // â”€â”€ PRIORITY 1: Decode business data embedded in the URL â”€â”€â”€â”€â”€â”€
-    // Real customers scan the QR on their phone â€” their localStorage is empty.
-    // So the QR URL now contains all needed business data, base64-encoded in ?d=
-    try {
-      const params  = new URLSearchParams(location.search);
-      const encoded = params.get('d');
-      if (encoded) {
-        const decoded = JSON.parse(decodeURIComponent(atob(encoded)));
-        if (decoded && decoded.n) {
-          return {
-            id:        decoded.id || id || 'unknown',
-            name:      decoded.n,
-            type:      decoded.t  || 'general',
-            googleUrl: decoded.g  || '',
-            phone:     decoded.p  || '',
-            email:     decoded.e  || '',
-            apiKey:    decoded.k  || '',
-          };
-        }
-      }
-    } catch(e) { /* fall through to localStorage */ }
-
-    // â”€â”€ PRIORITY 2: Read from localStorage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    // Works when admin opens the link in the same browser they configured.
     try {
       const list = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
       if (!list.length) return null;
       if (id) return list.find(b => b.id === id) || list[0];
       const activeId = localStorage.getItem(ACTIVE_KEY);
       return list.find(b => b.id === activeId) || list[0];
-    } catch(e) { return null; }
+    } catch { return null; }
   }
 
   function applyBizToUI() {
@@ -140,7 +116,7 @@ const R = (() => {
     document.getElementById('page-title').textContent  = `Review ${b.name}`;
   }
 
-  /* â”€â”€ NAVIGATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── NAVIGATION ───────────────────────────────────────── */
   function showView(id) {
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     const el = document.getElementById(id);
@@ -163,7 +139,7 @@ const R = (() => {
     return active ? active.id : 'view-rate';
   }
 
-  /* â”€â”€ STAR RATING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── STAR RATING ──────────────────────────────────────── */
   function bindRating() {
     const btns = document.querySelectorAll('.star-btn');
     const label = document.getElementById('rating-label');
@@ -192,7 +168,7 @@ const R = (() => {
         setTimeout(() => {
           if (rating >= 4) {
             loadChips();
-            document.getElementById('step2-rating-badge').textContent = 'â­'.repeat(rating);
+            document.getElementById('step2-rating-badge').textContent = '⭐'.repeat(rating);
             goTo('view-build');
           } else {
             incStat('shielded');
@@ -205,7 +181,7 @@ const R = (() => {
     });
   }
 
-  /* â”€â”€ KEYWORD CHIPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── KEYWORD CHIPS ────────────────────────────────────── */
   function loadChips() {
     const wrap = document.getElementById('chips-wrap');
     wrap.innerHTML = '';
@@ -216,147 +192,155 @@ const R = (() => {
   }
 
   function makeChip(text) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'chip';
-    btn.textContent = text;
-    btn.addEventListener('click', () => {
-      btn.classList.toggle('selected');
-      keywords = Array.from(document.querySelectorAll('.chip.selected')).map(c => c.textContent);
+    const chip = document.createElement('button');
+    chip.className = 'kw-chip';
+    chip.textContent = text;
+    chip.type = 'button';
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('active');
+      const idx = keywords.indexOf(text);
+      if (idx > -1) keywords.splice(idx, 1);
+      else keywords.push(text);
       updateGenerateBtn();
     });
-    return btn;
+    return chip;
   }
 
   function addCustomChip() {
     const input = document.getElementById('custom-kw');
     const val = input.value.trim();
-    if (!val) return;
-    const chip = makeChip('â­ ' + val);
-    chip.classList.add('selected');
-    document.getElementById('chips-wrap').prepend(chip);
-    keywords.unshift('â­ ' + val);
+    if (!val || keywords.includes(val)) return;
+    keywords.push(val);
+    const wrap = document.getElementById('chips-wrap');
+    const chip = makeChip(val);
+    chip.classList.add('active', 'custom');
+    wrap.appendChild(chip);
     input.value = '';
     updateGenerateBtn();
   }
 
   function updateGenerateBtn() {
-    document.getElementById('btn-generate').disabled = keywords.length === 0;
+    const btn = document.getElementById('btn-generate');
+    if (!btn) return;
+    btn.disabled = keywords.length === 0;
   }
 
-  /* â”€â”€ AI REVIEW GENERATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── AI REVIEW GENERATION ──────────────────────────────── */
   async function generateReview() {
-    const tone = document.getElementById('sel-tone').value;
-    const lang = document.getElementById('sel-lang').value;
-    const loader = document.getElementById('ai-loader');
-    const card   = document.getElementById('review-card');
-    const btnGen = document.getElementById('btn-generate');
-    const btnTo  = document.getElementById('btn-to-post');
+    if (keywords.length === 0) return;
 
-    card.classList.add('hidden');
-    btnTo.classList.add('hidden');
+    const loader = document.getElementById('ai-loader');
+    const card = document.getElementById('review-card');
+    const textarea = document.getElementById('review-text');
+    const btnGen = document.getElementById('btn-generate');
+    const btnPost = document.getElementById('btn-to-post');
+
     loader.classList.remove('hidden');
-    btnGen.disabled = true;
+    card.classList.add('hidden');
+    btnGen.classList.add('hidden');
 
     try {
-      const text = business.apiKey && business.apiKey.length > 10
-        ? await callGemini(tone, lang)
-        : await synthesise(tone, lang);
-
-      review = text;
-      document.getElementById('review-text').value = text;
+      review = await callAI();
+      textarea.value = review;
       loader.classList.add('hidden');
       card.classList.remove('hidden');
-      btnTo.classList.remove('hidden');
-    } catch {
-      review = await synthesise(tone, lang);
-      document.getElementById('review-text').value = review;
+      btnPost.classList.remove('hidden');
+    } catch (err) {
+      console.error('AI generation error:', err);
       loader.classList.add('hidden');
-      card.classList.remove('hidden');
-      btnTo.classList.remove('hidden');
-    } finally {
-      btnGen.disabled = false;
+      btnGen.classList.remove('hidden');
+      alert('Could not generate review. Please try again.');
     }
   }
 
-  async function callGemini(tone, lang) {
-    const toneMap = {
-      enthusiastic: 'enthusiastic, warm, detailed (50-60 words)',
-      natural:      'natural, conversational, authentic (35-45 words)',
-      crisp:        'short, direct, impactful (20-30 words)',
-      professional: 'polished, professional, structured (45-55 words)',
-    };
-    const langMap = {
-      english:  'Write in natural English.',
-      hinglish: 'Write in Urban Indian Hinglish (mix of casual Hindi and English).',
-      spanish:  'Write in natural conversational Spanish.',
-      french:   'Write in natural French.',
-    };
-    const prompt = `Write a genuine ${rating}-star Google review for "${business.name}" (${business.type}).
-Highlights to mention: ${keywords.join(', ')}.
-Style: ${toneMap[tone] || toneMap.natural}.
-${langMap[lang] || langMap.english}
-Rules: mention business name once naturally, sound like a real customer, end with recommendation. No hashtags. Return only the review text.`;
+  async function callAI() {
+    const tone = document.getElementById('sel-tone')?.value || 'enthusiastic';
+    const lang = document.getElementById('sel-lang')?.value || 'english';
+    const key = business.geminiKey;
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${business.apiKey}`,
-      { method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:180,temperature:0.88} }),
-        signal: AbortSignal.timeout(10000) }
-    );
-    if (!res.ok) throw new Error('Gemini ' + res.status);
-    const json = await res.json();
-    const out  = json.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-    if (!out) throw new Error('empty');
-    return out;
-  }
-
-  async function synthesise(tone, lang) {
-    await new Promise(r => setTimeout(r, 700));
-    const biz = business.name;
-    const k1  = keywords[0]?.replace(/[^\w\s]/g,'').trim() || 'the exceptional service';
-    const k2  = keywords[1]?.replace(/[^\w\s]/g,'').trim() || 'the warm hospitality';
-    const k3  = keywords[2]?.replace(/[^\w\s]/g,'').trim() || '';
-
-    if (lang === 'hinglish') {
-      const p = [
-        `${biz} mein visit karke bahut acha laga! ${k1} toh ekdum first-class tha, aur ${k2} ne experience ko aur bhi better bana diya. Team bahut polite aur helpful thi. Definitely recommend karunga sabko!`,
-        `Recently ${biz} gaya aur experience sach mein zabardast raha. ${k1} aur ${k2} dono ne impress kiya. Service bhi fast thi. Will definitely be back soon!`,
-      ];
-      return p[Math.random()*p.length|0];
+    if (key) {
+      try {
+        return await geminiGenerate(key, tone, lang);
+      } catch (err) {
+        console.warn('Gemini failed, falling back to local:', err);
+      }
     }
-    const pools = {
-      crisp:        [`Loved ${biz}! ${k1} and ${k2} were outstanding. Highly recommend!`,`Top experience at ${biz}. ${k1} and ${k2} were both excellent. Will return!`],
-      natural:      [`Really impressed with ${biz}! ${k1} was spot on and ${k2} made the visit memorable.${k3?` Even ${k3} was a nice touch.`:''} Definitely coming back!`,`Dropped by ${biz} and had a wonderful time. The ${k1} was great, and ${k2} really stood out. Friendly and welcoming all around. Highly recommend!`],
-      professional: [`My visit to ${biz} was exemplary. The ${k1} demonstrated clear commitment to quality, and ${k2} exceeded expectations.${k3?` ${k3} was equally impressive.`:''} I recommend their services without reservation.`],
-      enthusiastic: [`Absolutely wonderful experience at ${biz}! The ${k1} was phenomenal, and ${k2} completely blew me away.${k3?` I also loved ${k3} â€” such a thoughtful touch.`:''} The team was warm and made every moment feel special. Will 100% be back and will tell everyone I know!`,`If you haven't visited ${biz} yet, you're missing out! From ${k1} to ${k2}, every detail was flawless.${k3?` And ${k3} was the cherry on top.`:''} 5-star experience â€” do yourself a favour and go!`],
-    };
-    const pool = pools[tone] || pools.enthusiastic;
-    return pool[Math.random()*pool.length|0];
+
+    return localGenerate(tone, lang);
   }
 
-  /* â”€â”€ CLIPBOARD & GOOGLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  async function geminiGenerate(key, tone, lang) {
+    const prompt = buildPrompt(tone, lang);
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${key}`;
+    
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }],
+        generationConfig: {
+          temperature: 0.9,
+          maxOutputTokens: 200,
+        }
+      })
+    });
+
+    if (!res.ok) throw new Error(`Gemini API error: ${res.status}`);
+    
+    const data = await res.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error('No text in response');
+    
+    return text.trim();
+  }
+
+  function localGenerate(tone, lang) {
+    const templates = {
+      enthusiastic: [
+        `If you haven't visited ${business.name} yet, you're missing out! ${keywords.slice(0, 3).join(', ')} — everything was absolutely perfect. ${keywords.length > 3 ? keywords.slice(3).join(', ') + ' too!' : ''} 5-star experience â€" go yourself and see! 🌟`,
+        `From ${keywords[0]} to ${keywords[keywords.length - 1]}, ${business.name} delivered beyond expectations. ${keywords.slice(1, -1).join(', ')} — truly outstanding! Highly recommend! ⭐`
+      ],
+      natural: [
+        `Great experience at ${business.name}! ${keywords.slice(0, 2).join(' and ')} stood out. ${keywords.length > 2 ? keywords.slice(2).join(', ') + ' were also excellent.' : ''} Would definitely return!`,
+        `Really enjoyed ${business.name}. ${keywords.join(', ')} — all top-notch. Worth visiting!`
+      ],
+      crisp: [
+        `${business.name}: ${keywords.slice(0, 3).join(', ')}. Excellent! ⭐`,
+        `Loved it! ${keywords.slice(0, 2).join(' + ')}. Recommended!`
+      ],
+      professional: [
+        `I recently visited ${business.name} and was thoroughly impressed. The establishment excelled in: ${keywords.join(', ')}. I would highly recommend this business to others seeking quality service.`,
+        `${business.name} provides exceptional service. Notable highlights include ${keywords.join(', ')}. A professional and reliable choice.`
+      ]
+    };
+
+    const options = templates[tone] || templates.natural;
+    return options[Math.floor(Math.random() * options.length)];
+  }
+
+  function buildPrompt(tone, lang) {
+    const bizType = getCatLabel(business.type);
+    return `Write a ${tone} Google review for "${business.name}", a ${bizType}. Include these highlights: ${keywords.join(', ')}. Language: ${lang}. Keep it under 150 words, natural, and authentic.`;
+  }
+
+  /* ── CLIPBOARD & GOOGLE ───────────────────────────────── */
   async function copy(text) {
     try {
-      // Works on HTTPS and localhost
-      if (navigator.clipboard && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+      if (navigator.clipboard && location.protocol === 'https:') {
         await navigator.clipboard.writeText(text);
-        return;
+      } else {
+        const ta = Object.assign(document.createElement('textarea'),
+          { value: text, style: 'position:fixed;opacity:0' });
+        document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
       }
-    } catch(e) { /* fallback */ }
-    // Fallback for plain HTTP
-    try {
-      const ta = Object.assign(document.createElement('textarea'),
-        { value: text, style: 'position:fixed;left:-9999px;opacity:0' });
-      document.body.appendChild(ta);
-      ta.select();
-      ta.setSelectionRange(0, ta.value.length);
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-    } catch(e) { /* silent */ }
+    } catch { /* silent */ }
   }
 
-  function showToast(msg = 'âœ… Copied!') {
+  function showToast(msg = '✅ Copied!') {
     const t = document.getElementById('copy-toast');
     t.textContent = msg;
     t.classList.add('show');
@@ -365,10 +349,10 @@ Rules: mention business name once naturally, sound like a real customer, end wit
 
   // Alias for copy toast
   function showCopyToast() {
-    showToast('âœ“ Copied to clipboard! Opening Google...');
+    showToast('✓ Copied to clipboard! Opening Google...');
   }
 
-  /* â”€â”€ BIND BUTTONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── BIND BUTTONS ─────────────────────────────────────── */
   function bindButtons() {
     // Generate
     document.getElementById('btn-generate')?.addEventListener('click', generateReview);
@@ -377,14 +361,10 @@ Rules: mention business name once naturally, sound like a real customer, end wit
     // Continue to post
     document.getElementById('btn-to-post')?.addEventListener('click', () => {
       const txt = document.getElementById('review-text').value.trim();
-      review = txt || review;
+      if (!txt) { alert('Review is empty!'); return; }
+      review = txt;
       document.getElementById('preview-text').textContent = review;
       goTo('view-post');
-    });
-
-    // Copy only
-    document.getElementById('btn-copy-only')?.addEventListener('click', async () => {
-      await copy(review); showToast();
     });
 
     // Google CTA - Enhanced with better UX
@@ -419,7 +399,7 @@ Rules: mention business name once naturally, sound like a real customer, end wit
             </svg>
           </div>
           <div class="btn-mega-text">
-            <div class="btn-mega-title">âœ“ Copied!</div>
+            <div class="btn-mega-title">✓ Copied!</div>
             <div class="btn-mega-sub">Opening Google Reviews...</div>
           </div>
         </div>
@@ -455,16 +435,13 @@ Rules: mention business name once naturally, sound like a real customer, end wit
     // WhatsApp
     document.getElementById('btn-wa')?.addEventListener('click', () => {
       if (!validateFB()) return;
-      if (!business.phone) {
-        showToast('âš ï¸ No WhatsApp number configured. Ask admin to add one.');
-        return;
-      }
+      if (!business.phone) { alert('Manager WhatsApp not configured. Contact admin.'); return; }
       const data = collectFB();
       const text = encodeURIComponent(
-        `ðŸš¨ *Private Customer Feedback (${rating}â˜…)*\n` +
+        `🚨 *Private Customer Feedback (${rating}★)*\n` +
         `Business: ${business.name}\n` +
         `Customer: ${data.name} | ${data.contact}\n` +
-        `Issues: ${data.issues}\n\n*Message:*\n"${data.msg}"\n\n_via Zone Digi Tech_`
+        `Issues: ${data.issues}\n\n*Message:*\n"${data.msg}"\n\n_via SmartReview AI_`
       );
       window.open(`https://wa.me/${business.phone.replace(/\D/g,'')}?text=${text}`, '_blank');
       showDone(false);
@@ -474,103 +451,117 @@ Rules: mention business name once naturally, sound like a real customer, end wit
     form?.addEventListener('submit', e => {
       e.preventDefault();
       if (!validateFB()) return;
-      if (!business.email) {
-        showToast('âš ï¸ No email configured. Ask admin to add one.');
-        return;
-      }
+      if (!business.email) { alert('Manager email not configured. Contact admin.'); return; }
       const data = collectFB();
-      const sub  = encodeURIComponent(`Private Feedback: ${rating}â˜… | ${business.name}`);
-      const body = encodeURIComponent(`Business: ${business.name}\nRating: ${rating}â˜…\nCustomer: ${data.name}\nContact: ${data.contact}\nIssues: ${data.issues}\n\nMessage:\n${data.msg}`);
+      const sub  = encodeURIComponent(`Private Feedback: ${rating}★ | ${business.name}`);
+      const body = encodeURIComponent(`Business: ${business.name}\nRating: ${rating}★\nCustomer: ${data.name}\nContact: ${data.contact}\nIssues: ${data.issues}\n\nMessage:\n${data.msg}`);
       location.href = `mailto:${business.email}?subject=${sub}&body=${body}`;
       showDone(false);
     });
   }
 
   function validateFB() {
-    const msg = document.getElementById('fb-msg')?.value.trim();
+    const msg = document.getElementById('fb-msg').value.trim();
     const err = document.getElementById('fb-err');
-    if (!msg) { err?.classList.remove('hidden'); document.getElementById('fb-msg')?.focus(); return false; }
-    err?.classList.add('hidden');
+    if (!msg) {
+      err.classList.remove('hidden');
+      return false;
+    }
+    err.classList.add('hidden');
     return true;
   }
 
   function collectFB() {
-    const msg     = document.getElementById('fb-msg')?.value.trim() || '';
-    const name    = document.getElementById('fb-name')?.value.trim() || 'Guest';
-    const contact = document.getElementById('fb-contact')?.value.trim() || 'Not provided';
-    const issues  = [...document.querySelectorAll('.issue-tag.active')].map(t => t.dataset.issue).join(', ') || 'General';
-    return { msg, name, contact, issues };
+    const tags = Array.from(document.querySelectorAll('.issue-tag.active')).map(t => t.dataset.issue);
+    return {
+      name: document.getElementById('fb-name')?.value || 'Anonymous',
+      contact: document.getElementById('fb-contact')?.value || 'Not provided',
+      issues: tags.length ? tags.join(', ') : 'General',
+      msg: document.getElementById('fb-msg').value.trim()
+    };
   }
 
-  /* â”€â”€ DONE SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-  function showDone(isPositive) {
-    const icon    = document.getElementById('done-icon');
-    const title   = document.getElementById('done-title');
-    const msg     = document.getElementById('done-msg');
+  function showDone(positive = true) {
+    const icon = document.getElementById('done-icon');
+    const title = document.getElementById('done-title');
+    const msg = document.getElementById('done-msg');
     const voucher = document.getElementById('voucher-card');
 
-    if (isPositive) {
-      icon.textContent  = 'ðŸŽ‰';
-      title.textContent = 'Thank you so much!';
-      msg.textContent   = `Your review directly supports the team at ${business.name}. We're grateful!`;
-      if (voucher) voucher.style.display = 'none';
+    if (positive) {
+      icon.textContent = '🎉';
+      title.textContent = 'Thank You!';
+      msg.textContent = 'Your review supports our team and helps us grow. We truly appreciate it!';
+      voucher.style.display = 'none';
     } else {
-      icon.textContent  = 'ðŸ™';
-      title.textContent = 'Feedback Received';
-      msg.textContent   = 'Our management has been notified and will respond within 24 hours.';
-      // Show voucher if configured
-      try {
-        const prefs = JSON.parse(localStorage.getItem('sr_prefs_v4') || '{}');
-        const code  = prefs.voucherCode;
-        const text  = prefs.voucherText;
-        if (code && voucher) {
-          const codeEl = document.getElementById('voucher-code');
-          const noteEl = voucher.querySelector('.voucher-note');
-          if (codeEl) codeEl.textContent = code;
-          if (noteEl && text) noteEl.textContent = text + ' Show this screen at checkout.';
-          voucher.style.display = '';
-        } else if (voucher) {
-          voucher.style.display = 'none';
-        }
-      } catch(e) {
-        if (voucher) voucher.style.display = 'none';
-      }
+      icon.textContent = '🙏';
+      title.textContent = 'We Appreciate Your Feedback';
+      msg.textContent = 'Thank you for helping us improve. Your concerns matter to us.';
+      voucher.style.display = 'block';
     }
-    showView('view-done');
+
+    goTo('view-done');
   }
 
-  /* â”€â”€ RESET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function resetFlow() {
-    rating = 0; keywords = []; review = '';
-    document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('lit'));
-    document.getElementById('rating-label').textContent = '';
-    document.getElementById('review-card')?.classList.add('hidden');
-    document.getElementById('btn-to-post')?.classList.add('hidden');
-    document.getElementById('fb-msg') && (document.getElementById('fb-msg').value = '');
-    document.querySelectorAll('.issue-tag.active').forEach(t => t.classList.remove('active'));
+    rating = 0;
+    keywords = [];
+    review = '';
     stepStack = [];
     showView('view-rate');
   }
 
-  /* â”€â”€ STATS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── HELPERS ──────────────────────────────────────────── */
+  function getCatLabel(type) {
+    const labels = {
+      restaurant: 'Restaurant & Dining',
+      cafe: 'Cafe & Coffee Shop',
+      salon: 'Hair Salon & Beauty',
+      clinic: 'Healthcare & Medical',
+      gym: 'Fitness & Gym',
+      retail: 'Retail Store',
+      hotel: 'Hotel & Hospitality',
+      auto: 'Automotive Service',
+      general: 'Local Business'
+    };
+    return labels[type] || labels.general;
+  }
+
+  function getAvatar(type) {
+    const avatars = {
+      restaurant: '🍽️',
+      cafe: '☕',
+      salon: '💇',
+      clinic: '🏥',
+      gym: '💪',
+      retail: '🛍️',
+      hotel: '🏨',
+      auto: '🔧',
+      general: '🏪'
+    };
+    return avatars[type] || avatars.general;
+  }
+
   function incStat(key) {
     if (!business) return;
-    const k = `${STAT_PREFIX}${business.id}_${key}`;
-    localStorage.setItem(k, (parseInt(localStorage.getItem(k) || '0', 10) + 1).toString());
+    try {
+      const k = `${STAT_PREFIX}${business.id}_${key}`;
+      const v = parseInt(localStorage.getItem(k) || '0') + 1;
+      localStorage.setItem(k, v.toString());
+    } catch {}
   }
 
-  /* â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-  function getAvatar(type) {
-    return { restaurant:'ðŸ½ï¸', cafe:'â˜•', salon:'âœ‚ï¸', clinic:'ðŸ©º', gym:'ðŸ‹ï¸', retail:'ðŸ›ï¸', hotel:'ðŸ¨', auto:'ðŸš—' }[type] || 'â­';
-  }
-  function getCatLabel(type) {
-    return { restaurant:'ðŸ½ï¸ Restaurant & Dining', cafe:'â˜• CafÃ© & Bakery', salon:'âœ‚ï¸ Salon & Spa', clinic:'ðŸ©º Healthcare Clinic', gym:'ðŸ‹ï¸ Gym & Fitness', retail:'ðŸ›ï¸ Retail Store', hotel:'ðŸ¨ Hotel & Resort', auto:'ðŸš— Auto Service', general:'ðŸ’¼ Local Business' }[type] || 'ðŸ’¼ Local Business';
-  }
-
-  /* â”€â”€ PUBLIC API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-  return { init, goTo, goBack, addCustomChip };
-
+  /* ── PUBLIC API ───────────────────────────────────────── */
+  return {
+    init,
+    goTo,
+    goBack,
+    addCustomChip
+  };
 })();
 
-document.addEventListener('DOMContentLoaded', R.init);
-
+// Initialize on load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', R.init);
+} else {
+  R.init();
+}
