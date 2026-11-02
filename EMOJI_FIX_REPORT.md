@@ -122,7 +122,7 @@ All 9 business categories now display emojis correctly:
 - 🛡️ Trustworthy Garage
 - 👍 100% Reliable
 
-#### 💼 General Business Keywords
+#### 💼 General Business Keywords   
 - 🏆 Outstanding Service
 - 😊 Warm & Friendly
 - ⚡ Prompt & Efficient

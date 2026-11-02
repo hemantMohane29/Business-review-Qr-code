@@ -30,8 +30,8 @@ const A = (() => {
     bindLockScreen();
   });
 
-  function bootApp() {
-    load();
+  async function bootApp() {
+    await load();
     bindNav();
     bindBizForm();
     bindSettings();
@@ -79,17 +79,31 @@ const A = (() => {
   }
 
   /* ── DATA LOAD / SAVE ─────────────────────────────────── */
-  function load() {
+  async function load() {
     try {
+      // Try to fetch from API first
+      const response = await fetch('/api/businesses');
+      if (response.ok) {
+        businesses = await response.json();
+        console.log('✅ Loaded businesses from API:', businesses.length);
+      } else {
+        // Fallback to localStorage if API fails
+        businesses = JSON.parse(localStorage.getItem(KEYS.businesses) || '[]');
+        console.warn('⚠️ API failed, using localStorage:', businesses.length);
+      }
+    } catch(e) { 
+      // Network error - use localStorage
       businesses = JSON.parse(localStorage.getItem(KEYS.businesses) || '[]');
-    } catch(e) { businesses = []; }
+      console.warn('⚠️ Network error, using localStorage:', businesses.length);
+    }
     activeId = localStorage.getItem(KEYS.active) || (businesses[0]?.id ?? null);
     if (businesses.length && !businesses.find(b => b.id === activeId)) {
       activeId = businesses[0].id;
     }
   }
 
-  function save() {
+  async function save() {
+    // Keep localStorage as backup
     localStorage.setItem(KEYS.businesses, JSON.stringify(businesses));
     if (activeId) localStorage.setItem(KEYS.active, activeId);
   }
@@ -168,26 +182,16 @@ const A = (() => {
   }
 
   function getReviewUrl(bizId) {
-    // MOBILE-FIRST: Embed business data in URL for cross-device compatibility
-    // Mobile devices don't have access to desktop's localStorage
+    // NEW API-BASED APPROACH: Use businessId parameter instead of embedded data
+    // Mobile devices will fetch business data from API using this ID
     const base = location.origin + location.pathname.replace(/[^/]*$/, REVIEW_PAGE);
     const biz = businesses.find(b => b.id === bizId);
     
     if (!biz) return base;
     
-    // Encode minimal business data in URL for mobile devices
-    const data = {
-      id: biz.id,
-      n: biz.name,           // name
-      t: biz.type,           // type
-      g: biz.googleUrl,      // google URL
-      p: biz.phone || '',    // phone
-      e: biz.email || ''     // email
-    };
-    
-    // Base64 encode to keep URL cleaner and avoid special character issues
-    const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
-    let url = `${base}?d=${encoded}`;
+    // Simple, clean URL with businessId parameter
+    // Review page will fetch business data from /api/businesses/[id]
+    const url = `${base}?businessId=${encodeURIComponent(biz.id)}`;
     
     return url;
   }
@@ -261,7 +265,7 @@ const A = (() => {
     });
   }
 
-  function saveBusiness() {
+  async function saveBusiness() {
     const name      = document.getElementById('f-name')?.value.trim();
     const type      = document.getElementById('f-type')?.value;
     const googleUrl = document.getElementById('f-google-url')?.value.trim();
@@ -306,9 +310,72 @@ const A = (() => {
     const btn = document.getElementById('btn-save-biz');
     btn.classList.add('loading');
 
-    setTimeout(() => {
-      const data = { name, type, googleUrl, phone, email, apiKey };
+    const data = { name, type, googleUrl, phone, email, apiKey };
 
+    try {
+      let savedBiz;
+      
+      if (editingId) {
+        // Update existing business via API
+        const response = await fetch(`/api/businesses/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update business via API');
+        }
+
+        savedBiz = await response.json();
+        
+        // Update local array
+        const idx = businesses.findIndex(b => b.id === editingId);
+        if (idx !== -1) businesses[idx] = savedBiz;
+        
+        console.log('✅ Business updated via API:', savedBiz.id);
+      } else {
+        // Create new business via API
+        const response = await fetch('/api/businesses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create business via API');
+        }
+
+        savedBiz = await response.json();
+        
+        // Add to local array
+        businesses.push(savedBiz);
+        activeId = savedBiz.id;
+        editingId = savedBiz.id;
+        
+        // Update form to edit mode
+        document.getElementById('form-card-title').textContent = 'Edit Business';
+        document.getElementById('btn-delete-biz').style.display = '';
+        
+        console.log('✅ Business created via API:', savedBiz.id);
+      }
+
+      // Keep localStorage in sync as backup
+      await save();
+      
+      renderBizList();
+      updateStats();
+      updateReviewUrlDisplay();
+      renderQR();
+
+      btn.classList.remove('loading');
+      toast(`Business "${name}" saved successfully!`, 'success');
+      
+    } catch (error) {
+      console.error('❌ API save failed:', error);
+      btn.classList.remove('loading');
+      
+      // Fallback to localStorage-only mode
       if (editingId) {
         const idx = businesses.findIndex(b => b.id === editingId);
         if (idx !== -1) businesses[idx] = { ...businesses[idx], ...data };
@@ -317,23 +384,21 @@ const A = (() => {
         businesses.push(newBiz);
         activeId = newBiz.id;
         editingId = newBiz.id;
-        // Update form to edit mode
         document.getElementById('form-card-title').textContent = 'Edit Business';
         document.getElementById('btn-delete-biz').style.display = '';
       }
 
-      save();
+      await save();
       renderBizList();
       updateStats();
       updateReviewUrlDisplay();
       renderQR();
 
-      btn.classList.remove('loading');
-      toast(`Business "${name}" saved successfully!`, 'success');
-    }, 400);
+      toast(`⚠️ Saved locally only (API unavailable). Business: "${name}"`, 'info');
+    }
   }
 
-  function deleteBusiness() {
+  async function deleteBusiness() {
     const biz = businesses.find(b => b.id === editingId);
     if (!biz) return;
     
@@ -343,11 +408,28 @@ const A = (() => {
     
     if (!window.confirm(confirmMsg)) return;
 
-    // Delete all stats for this business
+    try {
+      // Delete from API
+      const response = await fetch(`/api/businesses/${editingId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete business via API');
+      }
+
+      console.log('✅ Business deleted via API:', editingId);
+    } catch (error) {
+      console.error('❌ API delete failed:', error);
+      toast('⚠️ Deleted locally only (API unavailable)', 'info');
+    }
+
+    // Delete all stats for this business (local cleanup)
     ['scans', 'reviews', 'shielded'].forEach(key => {
       localStorage.removeItem(KEYS.stat(editingId, key));
     });
 
+    // Remove from local array
     businesses = businesses.filter(b => b.id !== editingId);
     
     // Set new active business or null
@@ -356,7 +438,7 @@ const A = (() => {
     }
     
     editingId = null;
-    save();
+    await save();
 
     document.getElementById('form-card-title').textContent = 'Add New Business';
     document.getElementById('btn-delete-biz').style.display = 'none';
@@ -589,6 +671,99 @@ const A = (() => {
     setTimeout(() => location.reload(), 1500);
   }
 
+  async function migrateToDatabase() {
+    const statusEl = document.getElementById('migration-status');
+    const btn = document.getElementById('btn-migrate');
+    
+    statusEl.className = 'alert alert-info';
+    statusEl.textContent = '🔄 Migrating businesses to database...';
+    statusEl.classList.remove('hidden');
+    btn.disabled = true;
+    btn.classList.add('loading');
+
+    try {
+      // Get localStorage businesses
+      const localBusinesses = JSON.parse(localStorage.getItem(KEYS.businesses) || '[]');
+      
+      if (localBusinesses.length === 0) {
+        statusEl.className = 'alert alert-info';
+        statusEl.textContent = 'ℹ️ No businesses found in localStorage to migrate.';
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        setTimeout(() => statusEl.classList.add('hidden'), 4000);
+        return;
+      }
+
+      let created = 0;
+      let skipped = 0;
+      let failed = 0;
+
+      for (const biz of localBusinesses) {
+        try {
+          // Check if business already exists in database
+          const checkRes = await fetch(`/api/businesses/${biz.id}`);
+          
+          if (checkRes.ok) {
+            // Already exists, skip
+            skipped++;
+            console.log(`⏭️ Skipped (already exists): ${biz.name}`);
+            continue;
+          }
+
+          // Create new business in database
+          const createRes = await fetch('/api/businesses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(biz)
+          });
+
+          if (createRes.ok) {
+            created++;
+            console.log(`✅ Migrated: ${biz.name}`);
+          } else {
+            failed++;
+            console.error(`❌ Failed to migrate: ${biz.name}`);
+          }
+        } catch (error) {
+          failed++;
+          console.error(`❌ Migration error for ${biz.name}:`, error);
+        }
+      }
+
+      // Show results
+      if (failed === 0) {
+        statusEl.className = 'alert alert-success';
+        statusEl.textContent = `✅ Migration complete! Created: ${created}, Skipped: ${skipped}`;
+        
+        // Reload businesses from API
+        await load();
+        renderBizList();
+        updateStats();
+        updateReviewUrlDisplay();
+        renderQR();
+        
+        toast('Migration successful! Data now synced to cloud.', 'success');
+      } else {
+        statusEl.className = 'alert alert-danger';
+        statusEl.textContent = `⚠️ Migration partial. Created: ${created}, Skipped: ${skipped}, Failed: ${failed}`;
+        toast(`Migration completed with ${failed} errors. Check console.`, 'error');
+      }
+
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      setTimeout(() => statusEl.classList.add('hidden'), 8000);
+
+    } catch (error) {
+      console.error('❌ Migration failed:', error);
+      statusEl.className = 'alert alert-danger';
+      statusEl.textContent = `❌ Migration failed: ${error.message || 'Network error'}. Make sure Vercel KV is set up.`;
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      toast('Migration failed. Check console for details.', 'error');
+      setTimeout(() => statusEl.classList.add('hidden'), 8000);
+    }
+  }
+
   /* ── REFRESH ALL ──────────────────────────────────────── */
   function refreshAll() {
     document.getElementById('nav-biz-count').textContent  = businesses.length;
@@ -651,6 +826,7 @@ const A = (() => {
     showAddForm, saveBusiness, deleteBusiness,
     renderQR, downloadQR, copyReviewLink, testReviewLink,
     changePIN, savePrefs, resetStats, clearAllData,
+    migrateToDatabase,
   };
 
 })();
