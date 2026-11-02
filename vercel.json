@@ -4,6 +4,10 @@
   "name": "business-review-qr",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    },
+    {
       "source": "/review/:path*",
       "destination": "/customer-review.html"
     },

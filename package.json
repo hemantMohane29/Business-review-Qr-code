@@ -1,0 +1,17 @@
+{
+  "name": "business-review-qr",
+  "version": "2.0.0",
+  "description": "Business Review QR System with Backend API",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build needed'",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@vercel/kv": "^1.0.1",
+    "libphonenumber-js": "^1.10.51"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}
