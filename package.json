@@ -4,11 +4,11 @@
   "description": "Business Review QR System with Backend API",
   "scripts": {
     "dev": "vercel dev",
-    "build": "echo 'Static site - no build needed'",
+    "build": "node scripts/prepare-build.js",
     "deploy": "vercel --prod"
   },
   "dependencies": {
-    "@vercel/kv": "^1.0.1",
+    "@upstash/redis": "^1.40.0",
     "libphonenumber-js": "^1.10.51"
   },
   "engines": {
