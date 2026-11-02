@@ -34,31 +34,137 @@ const R = (() => {
   let stepStack  = [];
 
   /* ── INIT ─────────────────────────────────────────────── */
-  function init() {
+  async function init() {
     const params = new URLSearchParams(location.search);
+    const bizId = params.get('businessId') || params.get('b') || params.get('biz');
     
-    // Try loading from URL data first (for mobile cross-device compatibility)
-    let biz = loadBusinessFromUrl(params);
-    
-    // Fallback to localStorage (for same-device usage)
-    if (!biz) {
-      const bizId = params.get('b') || params.get('biz');
-      biz = loadBusiness(bizId);
-    }
-
-    if (!biz) {
-      // Show setup screen - no valid business found
+    if (!bizId) {
       showSetupNeeded();
       return;
     }
 
-    business = biz;
-    applyBizToUI();
-    incStat('scans');
-    showView('view-rate');
-    bindRating();
-    bindForm();
-    bindButtons();
+    // Show loading state
+    showLoading();
+    
+    try {
+      // Fetch business from API (primary method)
+      const biz = await fetchBusinessFromAPI(bizId);
+      
+      if (!biz) {
+        // Fallback: Try URL-embedded data (for backward compatibility)
+        const urlBiz = loadBusinessFromUrl(params);
+        if (urlBiz) {
+          business = urlBiz;
+        } else {
+          // Last fallback: localStorage (same device only)
+          business = loadBusiness(bizId);
+        }
+      } else {
+        business = biz;
+      }
+
+      if (!business) {
+        showSetupNeeded();
+        return;
+      }
+
+      applyBizToUI();
+      await incStatAPI('scans');
+      hideLoading();
+      showView('view-rate');
+      bindRating();
+      bindForm();
+      bindButtons();
+      
+    } catch (error) {
+      console.error('Initialization error:', error);
+      hideLoading();
+      showSetupNeeded('Unable to load business data. Please check your connection.');
+    }
+  }
+
+  /* ── API CALLS ────────────────────────────────────────── */
+  async function fetchBusinessFromAPI(bizId) {
+    try {
+      const response = await fetch(`/api/businesses/${bizId}?stats=false`);
+      
+      if (!response.ok) {
+        console.warn(`API returned ${response.status}`);
+        return null;
+      }
+      
+      const data = await response.json();
+      return data.success ? data.data : null;
+      
+    } catch (error) {
+      console.error('API fetch error:', error);
+      return null;
+    }
+  }
+
+  async function incStatAPI(statName) {
+    if (!business || !business.id) return;
+    
+    try {
+      await fetch(`/api/stats/${business.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stat: statName })
+      });
+      
+      // Also update localStorage as cache
+      incStat(statName);
+      
+    } catch (error) {
+      console.warn('Stat increment failed:', error);
+      // Fallback to localStorage only
+      incStat(statName);
+    }
+  }
+
+  async function submitFeedbackAPI(feedbackData) {
+    try {
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          businessId: business.id,
+          rating: feedbackData.rating,
+          feedback: feedbackData.msg,
+          customerName: feedbackData.name,
+          customerContact: feedbackData.contact,
+          issues: feedbackData.issues ? feedbackData.issues.split(', ') : []
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit feedback');
+      }
+      
+      const data = await response.json();
+      return data;
+      
+    } catch (error) {
+      console.error('Feedback submission error:', error);
+      throw error;
+    }
+  }
+
+  /* ── LOADING UI ───────────────────────────────────────── */
+  function showLoading() {
+    const loadingHTML = `
+      <div id="loading-overlay" style="position:fixed;inset:0;background:rgba(255,255,255,0.95);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+        <div style="width:50px;height:50px;border:4px solid #e8eaed;border-top-color:#4285f4;border-radius:50%;animation:spin 1s linear infinite;"></div>
+        <p style="margin-top:20px;color:#5f6368;font-size:0.9rem;">Loading business data...</p>
+      </div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    `;
+    document.body.insertAdjacentHTML('beforeend', loadingHTML);
+  }
+
+  function hideLoading() {
+    const loader = document.getElementById('loading-overlay');
+    if (loader) loader.remove();
   }
 
   function loadBusinessFromUrl(params) {
@@ -87,17 +193,21 @@ const R = (() => {
     }
   }
 
-  function showSetupNeeded() {
+  function showSetupNeeded(customMessage = null) {
     // Show professional "Invalid QR Code" message for mobile users
+    hideLoading(); // Remove loading if present
+    
     const setupView = document.getElementById('view-setup');
     if (setupView) {
       setupView.style.display = 'flex';
       setupView.innerHTML = `
         <div style="text-align:center; padding:60px 20px; max-width:400px; margin:0 auto;">
           <div style="font-size:4rem; margin-bottom:20px;">🔍</div>
-          <h2 style="font-size:1.4rem; font-weight:700; margin-bottom:12px; color:#202124;">Invalid QR Code</h2>
+          <h2 style="font-size:1.4rem; font-weight:700; margin-bottom:12px; color:#202124;">
+            ${customMessage ? 'Connection Error' : 'Invalid QR Code'}
+          </h2>
           <p style="color:#5F6368; line-height:1.6; margin-bottom:24px;">
-            This review link is not properly configured. Please scan the QR code provided by the business.
+            ${customMessage || 'This review link is not properly configured. Please scan the QR code provided by the business.'}
           </p>
           <p style="font-size:0.85rem; color:#9AA0A6; margin-bottom:20px;">
             Business owners: Configure your business in the admin panel first.
